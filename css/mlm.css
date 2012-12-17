@@ -1,0 +1,93 @@
+@CHARSET "UTF-8";
+
+.column-mlm {
+width:50px;
+}
+
+.column-mlm img {
+width:20px;
+height:20px;
+}
+
+.column-mlm img:hover {
+cursor:help;
+}
+
+.admin-settings
+{
+	text-align:right; 
+	vertical-align:top;
+}
+.toggle-visibility
+{
+	max-width: 500px; 
+	text-align: left; 
+	display: none; 
+}
+/*MLM settings heading page*/
+
+h2 .nav-tab {
+padding: 4px 10px 6px;
+font-weight: 700;
+font-size: 14px;
+line-height: 20px;
+}
+
+.helpmessage{
+	font-size:12px;
+	width:90%;
+	margin:10px;
+	border: 1px solid #DDD;
+	padding: 20px;
+	background: #FCFCFC;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+	border-radius: 2px;
+	
+}
+
+.forms-ui{
+	font-size:12px;
+	width:90%;
+	margin:10px;
+	border: 1px solid #DDD;
+	padding: 20px;
+	background: #FCFCFC;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+	border-radius: 2px;
+	
+}
+
+
+.helpmessage p{
+	margin:5 0 5px 0;
+	
+}
+
+/********************************************************************
+MLM user list
+********************************************************************/
+.userslist{
+margin:0;
+}
+
+.userslist .heading{
+line-height:40px;
+}
+
+.payout-run{
+	height:30px;
+	width:300px;
+	float:left;
+	text-align:center;
+}
+
+
+table.payout-summary td.right{
+text-align:right!important;
+}
+
+
+
+
