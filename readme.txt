@@ -16,9 +16,7 @@ favourite CMS - Wordpress.
 
 == Description ==
 
-The plugin enables you to run a full blown Binary MLM Network inside 
-
-of Wordpress.
+The plugin enables you to run a full blown Binary MLM Network inside of Wordpress.
 
 Features:
 
@@ -35,11 +33,9 @@ Features:
 
 == Installation ==
 
-1. Place the 'mlm' folder in your '/wp-content/plugins/' directory.
+1. Place the 'binary-mlm' folder in your '/wp-content/plugins/' directory. IMP. RENAME THE binary-mlm FOLDER TO mlm. This is temporary and would be fixed in the next revision.
 2. Activate Binary MLM.
-3. A new menu item would be created in the admin menu called Binary 
-
-MLM.
+3. A new menu item would be created in the admin menu called Binary MLM.
 
 == Frequently asked questions ==
 
