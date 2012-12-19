@@ -13,7 +13,7 @@ function wpmlm_run_pay_cycle_functions()
 
 	$payoutMasterId = createPayoutMaster(); 
 	
-	global $table_prefix; 
+	global $table_prefix, $wpdb; 
 	$sql=  "SELECT 
 				id, date_notified, parent_id, child_ids, amount, SUM(amount) AS commission  
 			FROM 
@@ -27,14 +27,14 @@ function wpmlm_run_pay_cycle_functions()
 	//echo $sql; exit; 
 	
 		
-	$rs = mysql_query($sql); 
-	if(mysql_num_rows($rs)>0)
+	$rs = $wpdb->get_results($sql); 
+	if($wpdb->num_rows > 0)
 	{
-		while($row = mysql_fetch_array($rs))
+		foreach($rs as $row)
 		{
 			
-			$userId = $row['parent_id'];
-			$commissionAmt = $row['commission'];
+			$userId = $row->parent_id;
+			$commissionAmt = $row->commission;
 			$bonusAmt = getBonusAmountById($userId); 
 			$payout_settings = get_option('wp_mlm_payout_settings');
 			

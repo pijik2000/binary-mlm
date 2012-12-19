@@ -1,6 +1,7 @@
 <?php
 function my_show_extra_profile_fields( $user ) 
 { 
+	global $wpdb;	
 	$table_prefix = mlm_core_get_table_prefix();
 	
 	
@@ -63,12 +64,13 @@ function my_show_extra_profile_fields( $user )
 					$sql = "SELECT name
 							FROM {$table_prefix}mlm_country
 							ORDER BY name";
-					$sql = mysql_query($sql);
+					$results = $wpdb->get_results($sql);
 				?>
 				<select name="user_country" id="user_country" required = true >
 					<option value="">Select Country</option>
 				<?php
-					while($row = mysql_fetch_object($sql))
+					
+					foreach($results as $row)
 					{
 						if(esc_attr( get_the_author_meta( 'user_country', $user->ID ) )==$row->name)
 							$selected = 'selected';

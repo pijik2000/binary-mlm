@@ -26,18 +26,19 @@ switch($g_criteria1)
 
 function updatePaymentStatus()
 {
+	global $wpdb;
 	if(isset($_REQUEST['userId']) && isset($_REQUEST['status']))
 	{
 		$table_prefix = mlm_core_get_table_prefix();
 				
 		$sql = "UPDATE 
-					{$table_prefix}mlm_users 
-				SET 
-					payment_status = '".$_REQUEST['status']."'
-				WHERE 
-					user_id = '".$_REQUEST['userId']."'";
+								 {$table_prefix}mlm_users 
+				      SET 
+					     payment_status = '".$_REQUEST['status']."'
+				      WHERE 
+					     user_id = '".$_REQUEST['userId']."'";
 			
-		$rs = mysql_query($sql);
+		$rs = $wpdb->query($sql);
 		if(!$rs){
 			echo "<span class='error' style='color:red'>Updating Fail</span>";
 		} 		 

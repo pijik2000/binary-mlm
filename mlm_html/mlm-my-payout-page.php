@@ -7,6 +7,7 @@ $detailsArr =  my_payout_function();
 $page_id = get_post_id('mlm_my_payout_details_page');
 
 if(count($detailsArr)>0){
+$mlm_settings = get_option('wp_mlm_general_settings');
 	?>
 	<table width="100%" border="0" cellspacing="10" cellpadding="1" id="payout-page">
 		<tr>
@@ -20,7 +21,7 @@ if(count($detailsArr)>0){
 		?>
 		<tr>
 			<td><?= $row->payoutDate ?></td>
-			<td><?= $amount ?></td>
+			<td><?= $mlm_settings['currency'].' '.$amount ?></td>
 			<td><a href="<?php bloginfo('url')?>/?page_id=<?= $page_id?>&pid=<?= $row->payout_id?>">View</a></td>
 			
 		</tr>
@@ -32,7 +33,7 @@ if(count($detailsArr)>0){
 	}else{
 
 	?>
-	<div class="no-payout"> There is no any payout for you. </div>
+	<div class="no-payout"> You have not earned any commisssions yet. </div>
 	
 	<?php 
 	}
@@ -56,8 +57,7 @@ function my_payout_function()
 	
 	$mlm_user_id = $res[0]['id']; 
 	
-	
-	
+			
 	if ( is_user_logged_in())
 	{
 	

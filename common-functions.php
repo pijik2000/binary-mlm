@@ -3,14 +3,13 @@
 function getuseridbykey($key)
 {
 	$table_prefix = mlm_core_get_table_prefix();
-	$query = mysql_fetch_array(
-								mysql_query("
-												SELECT id 
-												FROM {$table_prefix}mlm_users 
-												WHERE `user_key` = '".$key."'
-											")
-								);
-	return $query['id'];
+	global $wpdb;
+	$id = $wpdb->get_var("
+																								SELECT id 
+																								FROM {$table_prefix}mlm_users 
+																								WHERE `user_key` = '".$key."'
+																					");
+	return $id;
 }
 
 //generate random key
@@ -47,17 +46,17 @@ function get_current_user_key()
 {
 	$table_prefix = mlm_core_get_table_prefix();
 	
-	global $current_user;
+	global $current_user, $wpdb;
+	
 	get_currentuserinfo();
 	$username = $current_user->user_login;
-	$row = mysql_fetch_array(
-								mysql_query("
-												SELECT user_key 
-												FROM {$table_prefix}mlm_users 
-												WHERE username = '".$username."'
-											")
-							);
-	return $row['user_key'];
+
+	$user_key = $wpdb->get_var("
+																												SELECT user_key 
+																												FROM {$table_prefix}mlm_users 
+																												WHERE username = '".$username."'
+																								");
+	return $user_key;
 }
 
 //return the logeed user's fa_user id
@@ -65,140 +64,135 @@ function getUserIdByUsername()
 {
 	$table_prefix = mlm_core_get_table_prefix();
 	
-	global $current_user;
+	global $current_user, $wpdb;
+	
 	get_currentuserinfo();
 	$username = $current_user->user_login;
-	$row = mysql_fetch_array(
-								mysql_query("
-												SELECT id 
-												FROM {$table_prefix}mlm_users 
-												WHERE username = '".$username."'
-											")
-								);
-	return $row['id'];
+
+	$id = $wpdb->get_var("
+																						SELECT id 
+																						FROM {$table_prefix}mlm_users 
+																						WHERE username = '".$username."'
+																				");
+	return $id;
 }
 
 function checkKey($key)
 {
 	$table_prefix = mlm_core_get_table_prefix();
-	$query = mysql_query("
-							SELECT user_key 
-						 	FROM {$table_prefix}mlm_users 
-						  	WHERE `user_key` = '".$key."' 
-						  	AND banned = '0'
-						");
-	if(mysql_num_rows($query)<1)
-	{
-		return false;
-	}
+	global $wpdb;
+	$user_key = $wpdb->get_var("
+																											SELECT user_key 
+						 																					FROM {$table_prefix}mlm_users 
+						  																				WHERE `user_key` = '".$key."' 
+						  																				AND banned = '0'
+																									");
+	if(!$user_key)
+			return false;
+	
 	return true;
 }
 
 function checkallowed($key,$leg=NULL)
 {
+	global $wpdb;
 	$table_prefix = mlm_core_get_table_prefix();
-	$query = mysql_query("
-							SELECT username 
-						  	FROM {$table_prefix}mlm_users 
-						 	WHERE leg = '".$leg."' 
-						  	AND parent_key = '".$key."'
-						");
-	$num = mysql_num_rows($query);
-	return $num;
+	
+	$username = $wpdb->get_var("
+																													SELECT username 
+						  																						FROM {$table_prefix}mlm_users 
+						 																							WHERE leg = '".$leg."' 
+						  																						AND parent_key = '".$key."'
+																									");
+	return $wpdb->num_rows;
 }
 
 function totalLeftLegUsers($pkey)
 {
+	global $wpdb;	
 	$table_prefix = mlm_core_get_table_prefix();
-	$row = mysql_fetch_array(
-								mysql_query("
-												SELECT COUNT(*) AS num
-												FROM {$table_prefix}mlm_leftleg
-												WHERE pkey = '".$pkey."'
-											")
-							);
-	return $row['num'];
+	$num = $wpdb->get_var("
+																							SELECT COUNT(*) AS num
+																							FROM {$table_prefix}mlm_leftleg
+																							WHERE pkey = '".$pkey."'
+																				");
+	return $num;
 }
 
 function totalRightLegUsers($pkey)
 {
+	global $wpdb;	
 	$table_prefix = mlm_core_get_table_prefix();
-	$row = mysql_fetch_array(
-								mysql_query("
-												SELECT COUNT(*) AS num
-												FROM {$table_prefix}mlm_rightleg
-												WHERE pkey = '".$pkey."'
-											")
-							);
-	return $row['num'];
+	$num = $wpdb->get_var("
+																							SELECT COUNT(*) AS num
+																							FROM {$table_prefix}mlm_rightleg
+																							WHERE pkey = '".$pkey."'
+																				");
+	return $num;
 }
 
 function activeUsersOnLeftLeg($pkey)
 {
+	global $wpdb;
 	$table_prefix = mlm_core_get_table_prefix();
 
-	$row = mysql_fetch_array(
-								mysql_query("
-												SELECT COUNT(*) AS num
-												FROM {$table_prefix}mlm_users
-												WHERE payment_status = '1'
-												AND user_key IN
-												(
-													SELECT ukey 
-													FROM {$table_prefix}mlm_leftleg
-													WHERE pkey = '".$pkey."'
-												)
-											")
-							);
-	return $row['num'];
+	$num = $wpdb->get_var("
+																								SELECT COUNT(*) AS num
+																								FROM {$table_prefix}mlm_users
+																								WHERE payment_status = '1'
+																								AND user_key IN
+																								(
+																												SELECT ukey 
+																												FROM {$table_prefix}mlm_leftleg
+																												WHERE pkey = '".$pkey."'
+																								)
+																					");
+	return $num;
 }
 
 function activeUsersOnRightLeg($pkey)
 {
+	global $wpdb;	
 	$table_prefix = mlm_core_get_table_prefix();
 
-	$row = mysql_fetch_array(
-								mysql_query("
-												SELECT COUNT(*) AS num
-												FROM {$table_prefix}mlm_users
-												WHERE payment_status = '1'
-												AND user_key IN
-												(
-													SELECT ukey 
-													FROM {$table_prefix}mlm_rightleg
-													WHERE pkey = '".$pkey."'
-												)
-											")
-							);
-	return $row['num'];
+	$num = $wpdb->get_var("
+																								SELECT COUNT(*) AS num
+																								FROM {$table_prefix}mlm_users
+																								WHERE payment_status = '1'
+																								AND user_key IN
+																								(
+																												SELECT ukey 
+																												FROM {$table_prefix}mlm_rightleg
+																												WHERE pkey = '".$pkey."'
+																								)
+																				");
+	return $num;
 }
 
 function totalMyPersonalSales($sponsor)
 {
+	global $wpdb;		
 	$table_prefix = mlm_core_get_table_prefix();
 
-	$row = mysql_fetch_array(
-								mysql_query("
-												SELECT COUNT(*) AS num
-												FROM {$table_prefix}mlm_users
-												WHERE sponsor_key = '".$sponsor."'
-											")
-							);
-	return $row['num'];
+	$num = $wpdb->get_var("
+																								SELECT COUNT(*) AS num
+																								FROM {$table_prefix}mlm_users
+																								WHERE sponsor_key = '".$sponsor."'
+																				");
+	return $num;
 }
 
 function activeUsersOnPersonalSales($sponsor)
 {
+	global $wpdb;		
 	$table_prefix = mlm_core_get_table_prefix();
-	$row = mysql_fetch_array(
-								mysql_query("
-												SELECT COUNT(*) AS num
-												FROM {$table_prefix}mlm_users
-												WHERE sponsor_key = '".$sponsor."'
-												AND payment_status = '1'
-											")
-							);
-	return $row['num'];
+	$num = $wpdb->get_var("
+																							SELECT COUNT(*) AS num
+																							FROM {$table_prefix}mlm_users
+																							WHERE sponsor_key = '".$sponsor."'
+																							AND payment_status = '1'
+																				");
+	return $num;
 }
 
 function activeNotActive($status)
@@ -211,26 +205,28 @@ function activeNotActive($status)
 
 function myFiveLeftLegUsers($pkey)
 {
+	global $wpdb;	
 	$table_prefix = mlm_core_get_table_prefix();
 	$sql = "SELECT username, payment_status
-			FROM {$table_prefix}mlm_users
-			WHERE user_key IN
-			(
-				SELECT ukey 
-				FROM {$table_prefix}mlm_leftleg
-				WHERE pkey = '".$pkey."'
-				ORDER BY id DESC
-			)
-			ORDER BY id DESC
-			LIMIT 0,5";
-	$sql = mysql_query($sql);
-    $i = 0;
-	if(mysql_num_rows($sql)>0)
+								FROM {$table_prefix}mlm_users
+								WHERE user_key IN
+								(
+											SELECT ukey 
+											FROM {$table_prefix}mlm_leftleg
+											WHERE pkey = '".$pkey."'
+											ORDER BY id DESC
+								)
+								ORDER BY id DESC
+								LIMIT 0,5";
+			
+	$results = $wpdb->get_results($sql);
+ $i = 0;
+	if($wpdb->num_rows > 0)
 	{
-		while($row = mysql_fetch_array($sql))
+		foreach($results as $data)
 		{
-			$users[$i]['username'] = $row['username'];
-			$users[$i]['payment_status'] = activeNotActive($row['payment_status']);
+			$users[$i]['username'] = $data->username;
+			$users[$i]['payment_status'] = activeNotActive($data->payment_status);
 			$i++;
 		}
 	}
@@ -245,26 +241,28 @@ function myFiveLeftLegUsers($pkey)
 
 function myFiveRightLegUsers($pkey)
 {
+	global $wpdb;	
 	$table_prefix = mlm_core_get_table_prefix();
 	$sql = "SELECT username, payment_status
-			FROM {$table_prefix}mlm_users
-			WHERE user_key IN
-			(
-				SELECT ukey 
-				FROM {$table_prefix}mlm_rightleg
-				WHERE pkey = '".$pkey."'
-				ORDER BY id DESC
-			)
-			ORDER BY id DESC
-			LIMIT 0,5";
-	$sql = mysql_query($sql);
-    $i = 0;
-	if(mysql_num_rows($sql)>0)
+								FROM {$table_prefix}mlm_users
+								WHERE user_key IN
+							(
+										SELECT ukey 
+										FROM {$table_prefix}mlm_rightleg
+										WHERE pkey = '".$pkey."'
+										ORDER BY id DESC
+							)
+							ORDER BY id DESC
+							LIMIT 0,5";
+							
+	$results = $wpdb->get_results($sql);
+ $i = 0;
+	if($wpdb->num_rows > 0)
 	{
-		while($row = mysql_fetch_array($sql))
+		foreach($results as $data)
 		{
-			$users[$i]['username'] = $row['username'];
-			$users[$i]['payment_status'] = activeNotActive($row['payment_status']);
+			$users[$i]['username'] = $data->username;
+			$users[$i]['payment_status'] = activeNotActive($data->payment_status);
 			$i++;
 		}
 	}
@@ -278,20 +276,21 @@ function myFiveRightLegUsers($pkey)
 
 function myFivePersonalUsers($pkey)
 {
+	global $wpdb;	
 	$table_prefix = mlm_core_get_table_prefix();
 	$sql = "SELECT username, payment_status
-			FROM {$table_prefix}mlm_users
-			WHERE sponsor_key = '".$pkey."'
-			ORDER BY id DESC
-			LIMIT 0,5";
-	$sql = mysql_query($sql);
-    $i = 0;
-	if(mysql_num_rows($sql)>0)
+								FROM {$table_prefix}mlm_users
+								WHERE sponsor_key = '".$pkey."'
+								ORDER BY id DESC
+								LIMIT 0,5";
+	$results = $wpdb->get_results($sql);
+ $i = 0;
+	if($wpdb->num_rows > 0)
 	{
-		while($row = mysql_fetch_array($sql))
+		foreach($results as $data)
 		{
-			$users[$i]['username'] = $row['username'];
-			$users[$i]['payment_status'] = activeNotActive($row['payment_status']);
+			$users[$i]['username'] = $data->username;
+			$users[$i]['payment_status'] = activeNotActive($data->payment_status);
 			$i++;
 		}
 	}
@@ -305,38 +304,43 @@ function myFivePersonalUsers($pkey)
 
 function getSponsorName($key)
 {
+	global $wpdb;	
 	$table_prefix = mlm_core_get_table_prefix();
 	$sql = "SELECT username
-			FROM {$table_prefix}mlm_users
-			WHERE user_key = '".$key."'";
-	$sql = mysql_query($sql);
-	$row = mysql_fetch_array($sql);
-	return $row['username'];
+								FROM {$table_prefix}mlm_users
+								WHERE user_key = '".$key."'";
+	$username = $wpdb->get_var($sql);
+	
+	return $username;
 }
 
 function myTotalLeftLegUsers($pkey)
 {
+	global $wpdb;
+		
 	$table_prefix = mlm_core_get_table_prefix();
 	$sql = "SELECT username, payment_status, user_key, sponsor_key
-			FROM {$table_prefix}mlm_users
-			WHERE user_key IN
-			(
-				SELECT ukey 
-				FROM {$table_prefix}mlm_leftleg
-				WHERE pkey = '".$pkey."'
-				ORDER BY id DESC
-			)
-			ORDER BY id DESC";
-	$sql = mysql_query($sql);
-    $i = 0;
-	if(mysql_num_rows($sql)>0)
+								FROM {$table_prefix}mlm_users
+								WHERE user_key IN
+								(
+											SELECT ukey 
+											FROM {$table_prefix}mlm_leftleg
+											WHERE pkey = '".$pkey."'
+											ORDER BY id DESC
+								)
+								ORDER BY id DESC";
+
+	$results = $wpdb->get_results($sql);
+ 
+ $i = 0;
+	if($wpdb->num_rows > 0)
 	{
-		while($row = mysql_fetch_array($sql))
+		foreach($results as $data)
 		{
-			$users[$i]['username'] = $row['username'];
-			$users[$i]['user_key'] = $row['user_key'];
-			$users[$i]['sponsor_key'] = getSponsorName($row['sponsor_key']);
-			$users[$i]['payment_status'] = activeNotActive($row['payment_status']);
+			$users[$i]['username'] = $data->username;
+			$users[$i]['user_key'] = $data->user_key;
+			$users[$i]['sponsor_key'] = getSponsorName($data->sponsor_key);
+			$users[$i]['payment_status'] = activeNotActive($data->payment_status);
 			$i++;
 		}
 	}
@@ -350,27 +354,28 @@ function myTotalLeftLegUsers($pkey)
 
 function myTotalRightLegUsers($pkey)
 {
+	global $wpdb;	
 	$table_prefix = mlm_core_get_table_prefix();
 	$sql = "SELECT username, payment_status, user_key, sponsor_key
-			FROM {$table_prefix}mlm_users
-			WHERE user_key IN
-			(
-				SELECT ukey 
-				FROM {$table_prefix}mlm_rightleg
-				WHERE pkey = '".$pkey."'
-				ORDER BY id DESC
-			)
-			ORDER BY id DESC";
-	$sql = mysql_query($sql);
-    $i = 0;
-	if(mysql_num_rows($sql)>0)
+								FROM {$table_prefix}mlm_users
+								WHERE user_key IN
+								(
+											SELECT ukey 
+											FROM {$table_prefix}mlm_rightleg
+											WHERE pkey = '".$pkey."'
+											ORDER BY id DESC
+								)
+								ORDER BY id DESC";
+	$results = $wpdb->get_results($sql);
+ $i = 0;
+	if($wpdb->num_rows > 0)
 	{
-		while($row = mysql_fetch_array($sql))
+		foreach($results as $data)
 		{
-			$users[$i]['username'] = $row['username'];
-			$users[$i]['user_key'] = $row['user_key'];
-			$users[$i]['sponsor_key'] = getSponsorName($row['sponsor_key']);
-			$users[$i]['payment_status'] = activeNotActive($row['payment_status']);
+			$users[$i]['username'] = $data->username;
+			$users[$i]['user_key'] = $data->user_key;
+			$users[$i]['sponsor_key'] = getSponsorName($data->sponsor_key);
+			$users[$i]['payment_status'] = activeNotActive($data->payment_status);
 			$i++;
 		}
 	}
@@ -384,20 +389,21 @@ function myTotalRightLegUsers($pkey)
 
 function myTotalPersonalUsers($pkey)
 {
+	global $wpdb;	
 	$table_prefix = mlm_core_get_table_prefix();
 	$sql = "SELECT username, payment_status, user_key
-			FROM {$table_prefix}mlm_users
-			WHERE sponsor_key = '".$pkey."'
-			ORDER BY id DESC";
-	$sql = mysql_query($sql);
-    $i = 0;
-	if(mysql_num_rows($sql)>0)
+								FROM {$table_prefix}mlm_users
+								WHERE sponsor_key = '".$pkey."'
+								ORDER BY id DESC";
+	$results = $wpdb->get_results($sql);
+ $i = 0;
+	if($wpdb->num_rows > 0)
 	{
-		while($row = mysql_fetch_array($sql))
+		foreach($results as $data)
 		{
-			$users[$i]['username'] = $row['username'];
-			$users[$i]['user_key'] = $row['user_key'];
-			$users[$i]['payment_status'] = activeNotActive($row['payment_status']);
+			$users[$i]['username'] = $data->username;
+			$users[$i]['user_key'] = $data->user_key;
+			$users[$i]['payment_status'] = activeNotActive($data->payment_status);
 			$i++;
 		}
 	}
@@ -419,139 +425,150 @@ function legPlacement($leg)
 
 function totalSales($pkey)
 {
+	global $wpdb;	
 	$table_prefix = mlm_core_get_table_prefix();
 	$sql = "SELECT username, payment_status, user_key, sponsor_key, leg
-			FROM {$table_prefix}mlm_users
-			WHERE user_key IN
-			(
-				SELECT ukey 
-				FROM {$table_prefix}mlm_rightleg
-				WHERE pkey = '".$pkey."'
-				ORDER BY id DESC
-			)
-			ORDER BY id DESC";
-	$sql = mysql_query($sql);
-    $i = 0;
-	if(mysql_num_rows($sql)>0)
+								FROM {$table_prefix}mlm_users
+								WHERE user_key IN
+								(
+												SELECT ukey 
+												FROM {$table_prefix}mlm_rightleg
+												WHERE pkey = '".$pkey."'
+												ORDER BY id DESC
+								)
+								ORDER BY id DESC";
+	$results = $wpdb->get_results($sql);
+ $i = 0;
+	if($wpdb->num_rows > 0)
 	{
-		while($row = mysql_fetch_array($sql))
+		foreach($results as $data)
 		{
-			$rightUsers[$i]['username'] = $row['username'];
-			$rightUsers[$i]['user_key'] = $row['user_key'];
-			$rightUsers[$i]['sponsor_key'] = getSponsorName($row['sponsor_key']);
+			$rightUsers[$i]['username'] = $data->username;
+			$rightUsers[$i]['user_key'] = $data->user_key;
+			$rightUsers[$i]['sponsor_key'] = getSponsorName($data->sponsor_key);
 			$rightUsers[$i]['leg'] = legPlacement('1');
-			$rightUsers[$i]['payment_status'] = activeNotActive($row['payment_status']);
+			$rightUsers[$i]['payment_status'] = activeNotActive($data->payment_status);
 			$i++;
 		}
 	}
-	else
+	/*else
 	{
 		$rightUsers[$i]['username'] = 'No Member Found';
 		$rightUsers[$i]['payment_status'] = '';
-	}
+	}*/
 	
 	$sql = "SELECT username, payment_status, user_key, sponsor_key, leg
-			FROM {$table_prefix}mlm_users
-			WHERE user_key IN
-			(
-				SELECT ukey 
-				FROM {$table_prefix}mlm_leftleg
-				WHERE pkey = '".$pkey."'
-				ORDER BY id DESC
-			)
-			ORDER BY id DESC";
-	$sql = mysql_query($sql);
-    $i = 0;
-	if(mysql_num_rows($sql)>0)
+								FROM {$table_prefix}mlm_users
+								WHERE user_key IN
+								(
+												SELECT ukey 
+												FROM {$table_prefix}mlm_leftleg
+												WHERE pkey = '".$pkey."'
+												ORDER BY id DESC
+								)
+								ORDER BY id DESC";
+								
+	$results = $wpdb->get_results($sql);
+ $i = 0;
+	if($wpdb->num_rows > 0)
 	{
-		while($row = mysql_fetch_array($sql))
+		foreach($results as $data)
 		{
-			$leftUsers[$i]['username'] = $row['username'];
-			$leftUsers[$i]['user_key'] = $row['user_key'];
-			$leftUsers[$i]['sponsor_key'] = getSponsorName($row['sponsor_key']);
+			$leftUsers[$i]['username'] = $data->username;
+			$leftUsers[$i]['user_key'] = $data->user_key;
+			$leftUsers[$i]['sponsor_key'] = getSponsorName($data->sponsor_key);
 			$leftUsers[$i]['leg'] = legPlacement('0');
-			$leftUsers[$i]['payment_status'] = activeNotActive($row['payment_status']);
+			$leftUsers[$i]['payment_status'] = activeNotActive($data->payment_status);
 			$i++;
 		}
 	}
-	else
+	/*else
 	{
 		$leftUsers[$i]['username'] = 'No Member Found';
 		$leftUsers[$i]['payment_status'] = '';
-	}
-	$users = array($leftUsers, $rightUsers);
+	}*/
 	
-	return $users;
+		 if(count($leftUsers)!=0 || count($rightUsers)!=0)
+ 	 { 
+ 	 				$consultant = array($leftUsers, $rightUsers);
+ 	 				return $consultant;
+ 	  
+ 	 }
+ 	 else
+ 	 {
+ 	 				$default[0]['username'] ='No Members Found';
+ 	 				$default[0]['payment_status']= ''; 
+ 	 				//echo "<pre>";print_r($default); exit; 
+ 	    $consultant = array($default);
+ 	    return $consultant;
+ 	 }
 }
 
 function show_message_after_plugin_activation() 
 {
+	global $wpdb;	
 	$table_prefix = mlm_core_get_table_prefix();
-	$check1 = mysql_fetch_array(
-								mysql_query("
+	
+	$check1 = $wpdb->get_var("
 												SELECT COUNT(*) AS num 
 												FROM {$table_prefix}mlm_users
-											")
-							 );
+											");
 	
-	$check2 = mysql_fetch_array(
-								mysql_query("
+	$check2 = $wpdb->get_var("
 												SELECT COUNT(*) AS num 
 												FROM {$table_prefix}options
 												WHERE option_name = 'wp_mlm_general_settings'
-											")
-							 );
-	$check3 = mysql_fetch_array(
-								mysql_query("
+											");
+											
+	$check3 = $wpdb->get_var("
 												SELECT COUNT(*) AS num 
 												FROM {$table_prefix}options
 												WHERE option_name = 'wp_mlm_eligibility_settings'
-											")
-							 );
-	$check4 = mysql_fetch_array(
-								mysql_query("
+											");
+											
+	$check4 = $wpdb->get_var("
 												SELECT COUNT(*) AS num 
 												FROM {$table_prefix}options
 												WHERE option_name = 'wp_mlm_payout_settings'
-											")
-							 );
-	$check5 = mysql_fetch_array(
-								mysql_query("
+											");
+											
+	$check5 = $wpdb->get_var("
 												SELECT COUNT(*) AS num 
 												FROM {$table_prefix}options
 												WHERE option_name = 'wp_mlm_bonus_settings'
-											")
-							 );
+											");
+											
 	//wp_mlm_general_settings
 	//wp_mlm_eligibility_settings
 	//wp_mlm_payout_settings
 	//wp_mlm_bonus_settings
+	
 	$flag = 0;
-	if($check1['num']==0)
+	if($check1 == 0)
 	{
 		$msg = "<div class='updated fade'><p><strong>Please create the first user account in the MLM Network and configure other MLM settings. Please </strong>";
 		$tab = 'createuser';
 		$flag = 1;
 	}
-	else if($check2['num'] == 0)
+	else if($check2 == 0)
 	{
 		$msg = "<div class='updated fade'><p><strong>Please configure other MLM Settings. </strong>";
 		$tab = 'general';
 		$flag = 1;
 	}
-	else if($check3['num'] == 0)
+	else if($check3 == 0)
 	{
 		$msg = "<div class='updated fade'><p><strong>Complete the MLM settings. Please </strong>";
 		$tab = 'eligibility';
 		$flag = 1;
 	}
-	else if($check4['num'] == 0)
+	else if($check4 == 0)
 	{
 		$msg = "<div class='updated fade'><p><strong>Complete the MLM settings. Please </strong>";
 		$tab = 'payout';
 		$flag = 1;
 	}
-	else if($check5['num'] == 0)
+	else if($check5 == 0)
 	{
 		$msg = "<div class='updated fade'><p><strong>Complete the MLM settings. Please </strong>";
 		$tab = 'bonus';
@@ -566,22 +583,23 @@ remove_filter('the_content', 'wpautop');
 /************** Here begin the code for calculate and distribute the commission***********************/
 function mlmDistributeCommission()
 {
+	global $wpdb;	
 	$table_prefix = mlm_core_get_table_prefix();
 
 	//select all active users and give commision to their parents
-	$query = mysql_query("
-							SELECT user_key FROM {$table_prefix}mlm_users 
-							WHERE payment_status= '1' 
-							AND banned = '0'
-							ORDER BY id
-						");
-	$num = mysql_num_rows($query);
+	$results = $wpdb->get_results("
+																															SELECT user_key FROM {$table_prefix}mlm_users 
+																															WHERE payment_status= '1' 
+																															AND banned = '0'
+																															ORDER BY id
+																												");
+	$num = $wpdb->num_rows;
 	if($num)
 	{
-		while($result  = mysql_fetch_array($query))
+		foreach($results as $data)
 		{
-			if(mlmIsEligibleForCommission($result['user_key']))
-				mlmCalculateCommission($result['user_key']);
+			if(mlmIsEligibleForCommission($data->user_key))
+				mlmCalculateCommission($data->user_key);
 				
 		}
 	}
@@ -591,6 +609,7 @@ function mlmDistributeCommission()
 
 function mlmIsEligibleForCommission($key)
 {
+	global $wpdb;	
 	// get table's prefix used by your site database schema
 	$table_prefix = mlm_core_get_table_prefix();
 	
@@ -604,41 +623,39 @@ function mlmIsEligibleForCommission($key)
 	$leftusers = 0;
 	$rightusers =0; 
 	
-	$query = mysql_query("
-							SELECT user_key 
-							FROM {$table_prefix}mlm_users 
-							WHERE banned = '0' 
-							AND payment_status = '1' 
-							AND sponsor_key = '".$key."'
-			  			");
-	$num = mysql_num_rows($query);
+	$results = $wpdb->get_results("
+																														SELECT user_key 
+																														FROM {$table_prefix}mlm_users 
+																														WHERE banned = '0' 
+																														AND payment_status = '1' 
+																														AND sponsor_key = '".$key."'
+			  																							");
+	$num = $wpdb->num_rows;
 	
 	if($num)
 	{
-		while($result = mysql_fetch_array($query))
+		foreach($results as $data)
 		{
-			$sql = mysql_query("
-									SELECT COUNT(*) AS lactive 
-									FROM {$table_prefix}mlm_leftleg 
-									WHERE ukey = '".$result['user_key']."' 
-									AND pkey = '".$key."'
-							  ");
-			$lactive = mysql_fetch_array($sql);
+			$lactive = $wpdb->get_var("
+																													SELECT COUNT(*) AS lactive 
+																													FROM {$table_prefix}mlm_leftleg 
+																													WHERE ukey = '".$data->user_key."' 
+																													AND pkey = '".$key."'
+							  																		");
 			
-			if($lactive['lactive'] >= 1)
+			if($lactive >= 1)
 				$leftusers++;		
 					
-			$sql = mysql_query("
-									SELECT COUNT(*) AS ractive 
-									FROM {$table_prefix}mlm_rightleg 
-									WHERE ukey = '".$result['user_key']."' 
-									AND pkey = '".$key."'
-							");
-			$ractive = mysql_fetch_array($sql);
+			$ractive = $wpdb->get_var("
+																												SELECT COUNT(*) AS ractive 
+																												FROM {$table_prefix}mlm_rightleg 
+																												WHERE ukey = '".$data->user_key."' 
+																												AND pkey = '".$key."'
+																									");
 			
-			if($ractive['ractive'] >= 1)
+			if($ractive >= 1)
 				$rightusers++;
-		} //end while loop
+		} //end foreach loop
 		
 		//total direct referral including left and right
 		$total_referral = $leftusers + $rightusers;
@@ -650,7 +667,8 @@ function mlmIsEligibleForCommission($key)
 }
 	
 function mlmCalculateCommission($pkey)
-{
+{	
+	global $wpdb;	
 	// get table's prefix used by your site database schema
 	$table_prefix = mlm_core_get_table_prefix();
 	
@@ -668,75 +686,75 @@ function mlmCalculateCommission($pkey)
 	$leftno=0;
 				
 	//check users from left leg table 
-	$leftquery = mysql_query("
-								  SELECT  ukey 
-								  FROM {$table_prefix}mlm_leftleg, {$table_prefix}mlm_users 
-								  WHERE user_key = ukey 
-								  AND pkey = '".$pkey."' 
-								  AND commission_status = '0' 
-								  AND payment_status = '1'  
-								  ORDER BY {$table_prefix}mlm_users.id 
-								  LIMIT {$pair1}
-							");
+	$leftquery = $wpdb->get_results("
+								  																						SELECT  ukey 
+								  																						FROM {$table_prefix}mlm_leftleg, {$table_prefix}mlm_users 
+								  																						WHERE user_key = ukey 
+								  																						AND pkey = '".$pkey."' 
+								  																						AND commission_status = '0' 
+								  																						AND payment_status = '1'  
+								  																						ORDER BY {$table_prefix}mlm_users.id 
+								  																						LIMIT {$pair1}
+																													");
 								  
-	$leftno = mysql_num_rows($leftquery);
+	$leftno = $wpdb->num_rows;
 	if($leftno >= $pair1)
 	{
-		$rightquery = mysql_query("
-									   SELECT ukey 
-									   FROM {$table_prefix}mlm_rightleg, {$table_prefix}mlm_users 
-									   WHERE user_key = ukey 
-									   AND pkey = '".$pkey."' 
-									   AND commission_status = '0' 
-									   AND payment_status = '1'  
-									   ORDER BY {$table_prefix}mlm_users.id 
-									   LIMIT {$pair2}
-								");
+		$rightquery = $wpdb->get_results("
+									   																									SELECT ukey 
+									   																									FROM {$table_prefix}mlm_rightleg, {$table_prefix}mlm_users 
+									   																									WHERE user_key = ukey 
+									   																									AND pkey = '".$pkey."' 
+									   																									AND commission_status = '0' 
+									   																									AND payment_status = '1'  
+									   																									ORDER BY {$table_prefix}mlm_users.id 
+									   																									LIMIT {$pair2}
+																																");
 								   
-		$rgtno = mysql_num_rows($rightquery);
+		$rgtno = $wpdb->num_rows;
 		//check users from rgt leg table 
 		if($rgtno >= $pair2)
 		{
 			//mark users as paid and update commission table with child ids
 			$childs='';
-			while($leftresult = mysql_fetch_array($leftquery))
+			foreach($leftquery as $leftresult)
 			{
-				$leftupdate = mysql_query("
-												UPDATE {$table_prefix}mlm_leftleg 
-												SET commission_status = '1' 
-										   		WHERE pkey = '".$pkey."' 
-										   		AND ukey = '".$leftresult['ukey']."' 
-										   		LIMIT 1
-											");
+				$leftupdate = $wpdb->query("
+																															UPDATE {$table_prefix}mlm_leftleg 
+																															SET commission_status = '1' 
+										   																			WHERE pkey = '".$pkey."' 
+										   																			AND ukey = '".$leftresult->ukey."' 
+										   																			LIMIT 1
+																											");
 											
-				$childs .= mlmGetUserNameByKey($leftresult['ukey']).",";
+				$childs .= mlmGetUserNameByKey($leftresult->ukey).",";
 			}
 			
 			//mark users as paid and update commission table with child ids
-			while($rightresult = mysql_fetch_array($rightquery))
+			//while($rightresult = mysql_fetch_array($rightquery))
+			foreach($rightquery as $rightresult)
 			{
-				$rightupdate = mysql_query("
-												UPDATE {$table_prefix}mlm_rightleg SET commission_status = '1' 
-												WHERE pkey = '".$pkey."' 
-												AND ukey = '".$rightresult['ukey']."' 
-												LIMIT 1
-											");
+				$rightupdate = $wpdb->query("
+																																UPDATE {$table_prefix}mlm_rightleg SET commission_status = '1' 
+																																WHERE pkey = '".$pkey."' 
+																																AND ukey = '".$rightresult->ukey."' 
+																																LIMIT 1
+																												");
 											
-				$childs .= mlmGetUserNameByKey($rightresult['ukey']).",";
+				$childs .= mlmGetUserNameByKey($rightresult->ukey).",";
 			}
 			
 			//give commission and mark users as paid
 			$date = date("Y-m-d H:i:s");
 			$parent_id = getuseridbykey($pkey);
 			
-			$num = mysql_fetch_array(mysql_query("
-													SELECT COUNT(*) AS num 
-													FROM {$table_prefix}mlm_commission 
-													WHERE parent_id = $parent_id
-												 ")
-									);
+			$num = $wpdb->get_var("
+																									SELECT COUNT(*) AS num 
+																									FROM {$table_prefix}mlm_commission 
+																									WHERE parent_id = $parent_id
+												 										");
 			
-			if($num['num'] >= $initial_pair)
+			if($num >= $initial_pair)
 				$amount = $further_amount;
 			else
 				$amount = $initial_amount;
@@ -744,17 +762,16 @@ function mlmCalculateCommission($pkey)
 			$child_ids = $childs;
 			
 			//deduct service charge and tds
-			$insert = mysql_query("
-									INSERT INTO {$table_prefix}mlm_commission 
-									(
-										id, date_notified, parent_id, child_ids, amount
-									) 
-									VALUES 
-									(
-										NULL, '".$date."', '".$parent_id."', '".$child_ids."', '".$amount."'
-										
-									)
-								");	
+			$insert = $wpdb->query("
+																											INSERT INTO {$table_prefix}mlm_commission 
+																											(
+																														id, date_notified, parent_id, child_ids, amount
+																											) 
+																											VALUES 
+																											(
+																															NULL, '".$date."', '".$parent_id."', '".$child_ids."', '".$amount."'										
+																											)
+																							");	
 		}
 	}
 
@@ -763,94 +780,93 @@ function mlmCalculateCommission($pkey)
 	$leftno=0;				
 
 	//check users from rgt leg table
-	$rightquery = mysql_query("
-								   SELECT ukey 
-								   FROM {$table_prefix}mlm_rightleg, {$table_prefix}mlm_users
-								   WHERE user_key = ukey 
-								   AND pkey = '".$pkey."' 
-								   AND commission_status = '0' 
-								   AND payment_status = '1' 
-								   ORDER BY {$table_prefix}mlm_users.id 
-								   LIMIT {$pair1}
-							 "); 
+	$rightquery = $wpdb->get_results("
+								   																										SELECT ukey 
+								   																										FROM {$table_prefix}mlm_rightleg, {$table_prefix}mlm_users
+								   																										WHERE user_key = ukey 
+								   																										AND pkey = '".$pkey."' 
+								   																										AND commission_status = '0' 
+								   																										AND payment_status = '1' 
+								   																										ORDER BY {$table_prefix}mlm_users.id 
+								   																										LIMIT {$pair1}
+							 																							"); 
 							   
-	$rgtno = mysql_num_rows($rightquery);
+	$rgtno = $wpdb->num_rows;
 										
 	if($rgtno >= $pair1)
 	{	
 		//check users from rgt leg table 
-		$leftquery = mysql_query("
-									  SELECT ukey
-									  FROM {$table_prefix}mlm_leftleg, {$table_prefix}mlm_users
-									  WHERE user_key = ukey 
-									  AND pkey = '".$pkey."' 
-									  AND commission_status = '0' 
-									  AND payment_status = '1' 
-									  ORDER BY {$table_prefix}mlm_users.id
-									  LIMIT {$pair2}
-								");
+		$leftquery = $wpdb->get_results("
+									  																											SELECT ukey
+									  																											FROM {$table_prefix}mlm_leftleg, {$table_prefix}mlm_users
+									  																											WHERE user_key = ukey 
+									  																											AND pkey = '".$pkey."' 
+									  																											AND commission_status = '0' 
+									  																											AND payment_status = '1' 
+									  																											ORDER BY {$table_prefix}mlm_users.id
+									  																											LIMIT {$pair2}
+																															");
 								  
-		$leftno = mysql_num_rows($leftquery);
+		$leftno = $wpdb->num_rows;
 					
 		if($leftno >= $pair2)
 		{
 			//mark users as paid and update commission table with child ids
 			$childs='';
-			while($rightresult = mysql_fetch_array($rightquery))
+			
+			foreach($rightquery as $rightresult)
 			{
-				$rightupdate = mysql_query("
-												UPDATE {$table_prefix}mlm_rightleg 
-												SET commission_status = '1' 
-												WHERE pkey = '".$pkey."' 
-												AND ukey = '".$rightresult['ukey']."' 
-												LIMIT 1
-											");
+				$rightupdate = $wpdb->query("
+																																UPDATE {$table_prefix}mlm_rightleg 
+																																SET commission_status = '1' 
+																																WHERE pkey = '".$pkey."' 
+																																AND ukey = '".$rightresult->ukey."' 
+																																LIMIT 1
+																												");
 											
-				$childs .= mlmGetUserNameByKey($rightresult['ukey']).",";
+				$childs .= mlmGetUserNameByKey($rightresult->ukey).",";
 			}
 			//mark users as paid and update commission table with child ids
 										
-			while($leftresult = mysql_fetch_array($leftquery))
+			foreach($leftquery as $leftresult)
 			{
-				$leftupdate = mysql_query("
-												UPDATE {$table_prefix}mlm_leftleg 
-												SET commission_status = '1' 
-										   		WHERE pkey = '".$pkey."' 
-												AND ukey = '".$leftresult['ukey']."' 
-												LIMIT 1
-											");
+				$leftupdate = $wpdb->query("
+																															UPDATE {$table_prefix}mlm_leftleg 
+																															SET commission_status = '1' 
+										   																			WHERE pkey = '".$pkey."' 
+																															AND ukey = '".$leftresult->ukey."' 
+																															LIMIT 1
+																												");
 											
-				$childs .= mlmGetUserNameByKey($leftresult['ukey']).",";
+				$childs .= mlmGetUserNameByKey($leftresult->ukey).",";
 			}
 			//give commission and mark users as paid
 			$date = date("Y-m-d H:i:s");
 			$parent_id = getuseridbykey($pkey);
 			
-			$num = mysql_fetch_array(
-										mysql_query("
-														SELECT COUNT(*) AS num 
-														FROM {$table_prefix}mlm_commission 
-														WHERE parent_id = $parent_id
-												 	")
-									);
+			$num = $wpdb->get_var("
+																											SELECT COUNT(*) AS num 
+																											FROM {$table_prefix}mlm_commission 
+																											WHERE parent_id = $parent_id
+												 										");
 			
-			if($num['num'] >= $initial_pair)
+			if($num >= $initial_pair)
 				$amount = $further_amount;
 			else
 				$amount = $initial_amount;
 
 			$child_ids = $childs;
 			
-			$insert = mysql_query("
-									INSERT INTO {$table_prefix}mlm_commission 
-									(
-										id, date_notified, parent_id, child_ids, amount
-									) 
-									VALUES
-									(
-										NULL, '".$date."', '".$parent_id."', '".$child_ids."', '".$amount."'
-									)
-								");
+			$insert = $wpdb->query("
+																											INSERT INTO {$table_prefix}mlm_commission 
+																											(
+																														id, date_notified, parent_id, child_ids, amount
+																											) 
+																											VALUES
+																											(
+																															NULL, '".$date."', '".$parent_id."', '".$child_ids."', '".$amount."'
+																											)
+																							");
 								
 								
 		}
@@ -860,17 +876,17 @@ function mlmCalculateCommission($pkey)
 
 function mlmGetUserNameByKey($key)
 {
+	global $wpdb;	
 	// get table's prefix used by your site database schema
 	$table_prefix = mlm_core_get_table_prefix();
 	
-	$username = mysql_fetch_array(
-									mysql_query("
-													SELECT username 
-			  									 	FROM {$table_prefix}mlm_users 
-			   									 	WHERE user_key = '".$key."'
-												")
-								);
-		return $username['username'];
+	$username = $wpdb->get_var("
+																												SELECT username 
+			  									 															FROM {$table_prefix}mlm_users 
+			   									 														WHERE user_key = '".$key."'
+																								");
+																								
+		return $username;
 }
 /************** Here end the code for calculating and distributing the commission ***********************/
 
@@ -878,23 +894,24 @@ function mlmGetUserNameByKey($key)
 /************************* Here begin of the code for calculate  and distribute the bonus *****************************************/
 function mlmDistributeBonus()
 {
+	global $wpdb;	
 	$table_prefix = mlm_core_get_table_prefix();
 	
 	//select all active users and give commision to their parents
-	$query = mysql_query("
-							SELECT user_key FROM {$table_prefix}mlm_users 
-							WHERE payment_status= '1' 
-							AND banned = '0'
-							ORDER BY id
-						");
-	$num = mysql_num_rows($query);
+	$query = $wpdb->get_results("
+																													SELECT user_key FROM {$table_prefix}mlm_users 
+																													WHERE payment_status= '1' 
+																													AND banned = '0'
+																													ORDER BY id
+																									");
+	$num = $wpdb->num_rows;
 	
 	if($num)
 	{
-		while($result  = mysql_fetch_array($query))
+		foreach($query as $result)
 		{
-			if(mlmIsEligibleForCommission($result['user_key']))
-				mlmCalculateBonus($result['user_key']);
+			if(mlmIsEligibleForCommission($result->user_key))
+				mlmCalculateBonus($result->user_key);
 				
 		}
 	}
@@ -904,6 +921,7 @@ function mlmDistributeBonus()
 function mlmCalculateBonus($key)
 {
 	
+	global $wpdb;	
 	$table_prefix = mlm_core_get_table_prefix();
 	
 	//get the eligibility for bonus
@@ -912,44 +930,38 @@ function mlmCalculateBonus($key)
 	if($mlm_bonus['bonus_criteria'] == 'personal')
 	{
 		//count total direct referrals
-		$query = mysql_fetch_array(
-									mysql_query("
-													SELECT COUNT(*) AS num 
-													FROM {$table_prefix}mlm_users
-													WHERE sponsor_key = '".$key."'
-													AND payment_status = '1'
-													AND banned = '0'
-												")
-									);
-		$bonus_slab = $query['num'];
+		$query = $wpdb->get_var("
+																									SELECT COUNT(*) AS num 
+																									FROM {$table_prefix}mlm_users
+																									WHERE sponsor_key = '".$key."'
+																									AND payment_status = '1'
+																									AND banned = '0'
+																							");
+		$bonus_slab = $query;
 	}
 	else if($mlm_bonus['bonus_criteria'] == 'pair')
 	{		
 		//count total active users on left leg
-		$leftcount = mysql_fetch_array(
-										mysql_query("
-														SELECT COUNT(*) AS num 
-														FROM {$table_prefix}mlm_leftleg, {$table_prefix}mlm_users
-														WHERE user_key = ukey
-														AND pkey = '".$key."'
-														AND payment_status = '1'
-														AND banned = '0'
-												")
-									  );
+		$leftcount = $wpdb->get_var("
+																												SELECT COUNT(*) AS num 
+														                FROM {$table_prefix}mlm_leftleg, {$table_prefix}mlm_users
+														                WHERE user_key = ukey
+														                AND pkey = '".$key."'
+														                AND payment_status = '1'
+														                AND banned = '0'
+												                ");
 		//count total active users on right leg							  
-		$rightcount = mysql_fetch_array(
-										mysql_query("
-														SELECT COUNT(*) AS num 
-														FROM {$table_prefix}mlm_rightleg, {$table_prefix}mlm_users
-														WHERE user_key = ukey
-														AND pkey = '".$key."'
-														AND payment_status = '1'
-														AND banned = '0'
-												")
-									  );
+		$rightcount = $wpdb->get_var("
+														                 SELECT COUNT(*) AS num 
+														                 FROM {$table_prefix}mlm_rightleg, {$table_prefix}mlm_users
+														                 WHERE user_key = ukey
+														                 AND pkey = '".$key."'
+														                 AND payment_status = '1'
+														                 AND banned = '0'
+												                  ");
 		//count total numbers of active pair							  
-		$paircase1 = getPair($leftcount['num'], $rightcount['num']);
-		$paircase2 = getPair($rightcount['num'], $leftcount['num']);
+		$paircase1 = getPair($leftcount, $rightcount);
+		$paircase2 = getPair($rightcount, $leftcount);
 		
 		if($paircase1['pair'] >= $paircase2['pair'])
 			$bonus_slab = $paircase1['pair'];
@@ -977,10 +989,7 @@ function mlmCalculateBonus($key)
 		}
 		else
 			$flag = 0;
-	}
-
-	
-	
+	}	
 }
 
 function getPair($leftcount, $rightcount)
@@ -1009,38 +1018,37 @@ function getPair($leftcount, $rightcount)
 
 function distributeBonusSlab($mlm_user_id)
 {
+	global $wpdb;	
 	$table_prefix = mlm_core_get_table_prefix();
 	//count how many times bonus have been paid by the system previously
 	
-	$cb = mysql_fetch_array(
-								mysql_query("
-												SELECT COUNT(*) AS num
-												FROM {$table_prefix}mlm_bonus
-												WHERE mlm_user_id = '".$mlm_user_id."'
-											")
-							);
-	return $cb['num'];
+	$cb = $wpdb->get_var("
+																							SELECT COUNT(*) AS num
+																							FROM {$table_prefix}mlm_bonus
+																							WHERE mlm_user_id = '".$mlm_user_id."'
+																			");
+	return $cb;
 }
 
 function insertBonusSlab($mlm_user_id, $amount)
 {
+	global $wpdb;		
 	$table_prefix = mlm_core_get_table_prefix();
 	$date = date('Y-m-d H:i:s');
 	
 	//deduct service charge and tds
 	//$payable_amount_array = calculateTdsAndServiceCharge($amount);
 	
-	$insert = mysql_query("
-							INSERT INTO {$table_prefix}mlm_bonus
-							(
-								id, date_notified, mlm_user_id, amount
-							)
-							VALUES
-							(
-								NULL, '".$date."', '".$mlm_user_id."', '".$amount."'
-							)
-							
-						 ");
+	$insert = $wpdb->query("
+																								INSERT INTO {$table_prefix}mlm_bonus
+																								(
+																												id, date_notified, mlm_user_id, amount
+																								)
+																								VALUES
+																								(
+																												NULL, '".$date."', '".$mlm_user_id."', '".$amount."'
+																								)
+						 															");
 }
 /*********************** Here end the code of calculating and distributing bonus ******************************************/
 
@@ -1112,7 +1120,7 @@ function mlm_admin_menu()
 	//add_menu_page('WP-MLM-Settings', 'WP-MLM', 1,'register-first-user', 'register_first_user');
 	//add_submenu_page('register-first-user', 'Admin Settings', 'Admin Settings', 1,'admin-settings', 'adminMLMSettings');
 	
-	$icon_url =  plugins_url()."/mlm/images/mlm_tree.png";
+	$icon_url =  plugins_url()."/".MLM_PLUGIN_NAME."/images/mlm_tree.png";
 	add_menu_page('WP-MLM-Settings', 'Binary MLM', 1,'admin-settings', 'adminMLMSettings', $icon_url);
 	add_submenu_page('admin-settings','Settings','Settings','1','admin-settings','adminMLMSettings');
 	add_submenu_page('admin-settings','Run Payouts','Run Payouts','administrator','mlm-payout','adminMLMPayout');
@@ -1124,14 +1132,14 @@ function mlm_admin_menu()
 // get_post_id function return the inserted post_id's
 function get_post_id($page)
 {
+	global $wpdb;		
 	$table_prefix = mlm_core_get_table_prefix();
 	$sql = "SELECT post_id 
-			FROM {$table_prefix}postmeta 
-			WHERE meta_key = '".$page."' 
-			AND meta_value = '".$page."'";
-	$sql = mysql_query($sql);
-	$post_id = mysql_fetch_object($sql);
-	return $post_id->post_id;
+								FROM {$table_prefix}postmeta 
+								WHERE meta_key = '".$page."' 
+							 AND meta_value = '".$page."'";
+	$post_id = $wpdb->get_var($sql);
+	return $post_id;
 }
 
 //register_page function register the page and postID
@@ -1249,6 +1257,7 @@ function createTheMlmMenu()
 
 
 function add_payment_status_column_value( $value, $column_name, $user_id ){
+	global $wpdb;
 	//$user = get_userdata( $user_id );
 		
 	/***************************/
@@ -1257,16 +1266,15 @@ function add_payment_status_column_value( $value, $column_name, $user_id ){
 		
 		$table_prefix = mlm_core_get_table_prefix();
 		/*check that it is mlm user or not */
-		$sql = mysql_query("SELECT user_id, payment_status FROM {$table_prefix}mlm_users WHERE user_id = '".$user_id."'");
+		$res = $wpdb->get_row("SELECT user_id, payment_status FROM {$table_prefix}mlm_users WHERE user_id = '".$user_id."'");
 		$html = '';
 		
-		if(mysql_num_rows($sql)>0)
+		if($wpdb->num_rows > 0)
 		{
-			$res = mysql_fetch_array($sql);
 			
-			$path = "'".plugins_url()."'";
+			$path = "'".plugins_url()."/".MLM_PLUGIN_NAME."'";
 			
-			$currStatus = $res['payment_status'];
+			$currStatus = $res->payment_status;
 			global $paymenntStatusArr; 
 			
 			$html .= '<select name="payment_status_'.$user_id.'" id="payment_status_'.$user_id.'" onchange="update_payment_status('.$path.','.$user_id.',this.value)">';

@@ -2,7 +2,8 @@
 error_reporting(0);
 require_once("php-form-validation.php");
 function register_user_html_page()
-{ 
+{
+	global $wpdb; 
 	$table_prefix = mlm_core_get_table_prefix();
 	$error = '';
 	$chk = 'error';
@@ -87,8 +88,8 @@ function register_user_html_page()
 		$sql = "SELECT COUNT(*) num, `user_key` 
 				FROM {$table_prefix}mlm_users 
 				WHERE `username` = '".$sponsor."'";
-		$sql = mysql_query($sql);
-		$intro = mysql_fetch_array($sql);
+		$intro = $wpdb->get_row($sql);
+
 		
 		if($_GET['l']!='')
 			$leg = $_GET['l'];
@@ -107,11 +108,11 @@ function register_user_html_page()
 		//if generated key is already exist in the DB then again re-generate key
 		do
 		{
-			$check = mysql_fetch_array(mysql_query("SELECT COUNT(*) ck 
+			$check = $wpdb->get_var("SELECT COUNT(*) ck 
 													FROM {$table_prefix}mlm_users 
-													WHERE `user_key` = '".$user_key."'"));
+													WHERE `user_key` = '".$user_key."'");
 			$flag = 1;
-			if($check['ck']==1)
+			if($check==1)
 			{
 				$user_key = generateKey();
 				$flag = 0;
@@ -132,9 +133,9 @@ function register_user_html_page()
 		if(empty($error))
 		{
 			// inner if condition
-			if($intro['num']==1)
+			if($intro->num==1)
 			{
-				$sponsor = $intro['user_key'];
+				$sponsor = $intro->user_key;
 				$sponsor1 = $sponsor;
 				//find parent key
 				if($_GET['k']!='')
@@ -149,12 +150,11 @@ function register_user_html_page()
 						$sql = "SELECT `user_key` FROM {$table_prefix}mlm_users 
 								WHERE parent_key = '".$sponsor1."' AND 
 								leg = '".$leg."' AND banned = '0'";
-						$sql = mysql_query($sql);
-						$num = mysql_num_rows($sql);
+						$user_key = $wpdb->get_var($sql);
+						$num = $wpdb->num_rows;
 						if($num)
-						{
-							$spon = mysql_fetch_array($sql);
-							$sponsor1 = $spon['user_key'];
+						{							
+							$sponsor1 = $user_key;
 						}
 					}while($num==1);
 					$parent_key = $sponsor1;
@@ -177,15 +177,14 @@ function register_user_html_page()
 				$sql = "SELECT name 
 						FROM {$table_prefix}mlm_country
 						WHERE id = '".$country."'";
-				$sql = mysql_query($sql);
-				$country1 = mysql_fetch_object($sql);
+				$country1 = $wpdb->get_var($sql);
 				
 				//insert the registration form data into user_meta table
 				add_user_meta( $user_id, 'user_address1', $address1, $unique );
 				add_user_meta( $user_id, 'user_address2', $address2, $unique );
 				add_user_meta( $user_id, 'user_city', $city, $unique );
 				add_user_meta( $user_id, 'user_state', $state, $unique );
-				add_user_meta( $user_id, 'user_country', $country1->name, $unique );
+				add_user_meta( $user_id, 'user_country', $country1, $unique );
 				add_user_meta( $user_id, 'user_postalcode', $postalcode, $unique );
 				add_user_meta( $user_id, 'user_telephone', $telephone, $unique );
 				add_user_meta( $user_id, 'user_dob', $dob, $unique );
@@ -205,7 +204,7 @@ function register_user_html_page()
 							)";
 							
 				// if all data successfully inserted
-				if(mysql_query($insert))
+				if($wpdb->query($insert))
 				{	//begin most inner if condition
 					//entry on Left and Right Leg tables
 					if($leg==0)
@@ -218,7 +217,7 @@ function register_user_html_page()
 									(
 										'".$parent_key."','".$user_key."'
 									)";
-						$insert = mysql_query($insert);
+						$insert = $wpdb->query($insert);
 					}
 					else if($leg==1)
 					{
@@ -230,7 +229,7 @@ function register_user_html_page()
 									(
 										'".$parent_key."','".$user_key."'
 									)";
-						$insert = mysql_query($insert);
+						$insert = $wpdb->query($insert);
 					}
 					//begin while loop
 					while($parent_key!='0')
@@ -239,13 +238,12 @@ function register_user_html_page()
 								  FROM {$table_prefix}mlm_users 
 								  WHERE user_key = '".$parent_key."'
 								  AND banned = '0'";
-						$query = mysql_query($query);
-						$result = mysql_fetch_array($query);
-						if($result['num']==1)
+						$result = $wpdb->get_row($query);
+						if($result->num==1)
 						{
-							if($result['parent_key']!='0')
+							if($result->parent_key!='0')
 							{
-								if($result['leg']==1)
+								if($result->leg==1)
 								{
 									$tbright = "INSERT INTO {$table_prefix}mlm_rightleg 
 												(
@@ -253,9 +251,9 @@ function register_user_html_page()
 												) 
 												VALUES
 												(
-													'".$result['parent_key']."','".$user_key."'
+													'".$result->parent_key."','".$user_key."'
 												)";
-									$tbright = mysql_query($tbright);
+									$tbright = $wpdb->query($tbright);
 								}
 								else
 								{
@@ -265,12 +263,12 @@ function register_user_html_page()
 												) 
 												VALUES
 												(
-													'".$result['parent_key']."','".$user_key."'
+													'".$result->parent_key."','".$user_key."'
 												)";
-									$tbleft = mysql_query($tbleft);
+									$tbleft = $wpdb->query($tbleft);
 								}
 							}
-							$parent_key = $result['parent_key'];
+							$parent_key = $result->parent_key;
 						}
 						else
 						{
@@ -307,7 +305,7 @@ window.onload = function() {
 	<form name="frm" method="post" action="" onSubmit="return formValidation();">
 		<tr>
 			<td>Create Username <span style="color:red;">*</span> :</td>
-			<td><input type="text" name="username" id="username" value="<?= htmlentities($_POST['username']);?>" maxlength="20" size="37" onBlur="checkUserNameAvailability(this.value,'<?= plugins_url()."/mlm/ajax/check_username.php"?>');"><br /><div id="check_user"></div></td>
+			<td><input type="text" name="username" id="username" value="<?= htmlentities($_POST['username']);?>" maxlength="20" size="37" onBlur="checkUserNameAvailability(this.value,'<?= plugins_url()."/".MLM_PLUGIN_NAME."/ajax/check_username.php"?>');"><br /><div id="check_user"></div></td>
 		</tr>
 		
 		<tr><td colspan="2">&nbsp;</td></tr>
@@ -340,7 +338,7 @@ window.onload = function() {
 			?>
 			<td>Sponsor Name <span style="color:red;">*</span> :</td>
 			<td>
-			<input type="text" name="sponsor" id="sponsor" value="<?= $spon;?>" maxlength="20" size="37" onBlur="checkReferrerAvailability(this.value, '<?= plugins_url()."/mlm/ajax/check_username.php"?>');" <?= $readonly_sponsor;?>>
+			<input type="text" name="sponsor" id="sponsor" value="<?= $spon;?>" maxlength="20" size="37" onBlur="checkReferrerAvailability(this.value, '<?= plugins_url()."/".MLM_PLUGIN_NAME."/ajax/check_username.php"?>');" <?= $readonly_sponsor;?>>
 			<br /><div id="check_referrer"></div>
 			</td>
 		</tr>
@@ -432,12 +430,14 @@ window.onload = function() {
 					$sql = "SELECT id, name
 							FROM {$table_prefix}mlm_country
 							ORDER BY name";
-					$sql = mysql_query($sql);
+							
+					$results = $wpdb->get_results($sql);
 				?>
 				<select name="country" id="country" >
 					<option value="">Select Country</option>
 				<?php
-					while($row = mysql_fetch_object($sql))
+					
+					foreach($results as $row)
 					{
 						if($_POST['country']==$row->id)
 							$selected = 'selected';

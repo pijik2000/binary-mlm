@@ -32,11 +32,11 @@ function adminMLMPayout()
 		
 		</p>
 		
-		<p><?= plugins_url()?>/mlm/cronjobs/commission-bonus.php</p>
+		<p><?= plugins_url()."/".MLM_PLUGIN_NAME?>/cronjobs/commission-bonus.php</p>
 		
 		<p>The commission and bonus routines would simply keep distributing the commission and bonus amounts in the member accounts. They would not show up in their account till the time the Payout Routine is not run. This script can be run manually once every week, every fortnight or every month depending on the payout cycle of the network. Alternately, please schedule (cron job) the following URL as per the frequency of the payout cycle.</p>
 		
-		<p><?= plugins_url()?>/mlm/cronjobs/paycycle.php</p>
+		<p><?= plugins_url()."/".MLM_PLUGIN_NAME?>/cronjobs/paycycle.php</p>
 		
 		
 	</div>

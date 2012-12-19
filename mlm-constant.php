@@ -48,5 +48,5 @@ define("MLM_DISTRIBUTE_BONUS_TITLE", "MLM Distribute Bonus");
 define("MLM_DISTRIBUTE_BONUS_SHORTCODE", "mlm-distribute-bonus"); */
 
 
-define( "MLM_PAGE_PATH", plugins_url().'/mlm/mlm_html');
+define( "MLM_PAGE_PATH", plugins_url().'/'.MLM_PLUGIN_NAME.'/mlm_html');
 ?>

@@ -33,7 +33,7 @@ Features:
 
 == Installation ==
 
-1. Place the 'binary-mlm' folder in your '/wp-content/plugins/' directory. IMP. RENAME THE binary-mlm FOLDER TO mlm. This is temporary and would be fixed in the next revision.
+1. Place the 'binary-mlm' folder in your '/wp-content/plugins/' directory.
 2. Activate Binary MLM.
 3. A new menu item would be created in the admin menu called Binary MLM.
 
@@ -41,9 +41,7 @@ Features:
 
 = Does the plugin support multiple currencies? =
 
-The plugin gives you the option to choose the base currency for your 
-
-network. However, once chosen the currency cannot be changed.
+The plugin gives you the option to choose the base currency for your network. However, once chosen the currency cannot be changed.
 
 
 == Screenshots ==

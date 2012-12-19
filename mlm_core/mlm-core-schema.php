@@ -111,6 +111,7 @@ function mlm_core_install_country()
 
 function mlm_core_insert_into_country()
 {
+	global $wpdb;	
 	$table_prefix = mlm_core_get_table_prefix();
 	
 	$insert = "INSERT INTO {$table_prefix}mlm_country (`id`, `iso`, `name`, `iso3`, `numcode`) VALUES
@@ -354,7 +355,7 @@ function mlm_core_insert_into_country()
 				(238, 'ZM', 'Zambia', 'ZMB', 894),
 				(239, 'ZW', 'Zimbabwe', 'ZWE', 716)";
 				
-	if(!@mysql_query($insert));
+	if(!$wpdb->query($insert));
 		//echo "Check manual database error.";
 }
 
@@ -375,6 +376,7 @@ function mlm_core_install_currency()
 
 function mlm_core_insert_into_currency()
 {
+	global $wpdb;	
 	$table_prefix = mlm_core_get_table_prefix();
 	
 	$insert = "INSERT INTO {$table_prefix}mlm_currency (`id`, `iso3`, `currency`) VALUES
@@ -547,7 +549,7 @@ function mlm_core_insert_into_currency()
 				(167, 'ZMK', 'Zambian Kwacha'),
 				(168, 'ZWD', 'Zimbabwean Dollar')";
 				
-	if(!@mysql_query($insert));
+	if(!$wpdb->query($insert));
 	//echo "Check manual database error.";
 }
 
@@ -651,12 +653,14 @@ function mlm_core_delete_users_data()
 	global $wpdb;
 	$table_prefix = mlm_core_get_table_prefix();
 	$sql = "SELECT user_id 
-			FROM {$table_prefix}mlm_users";
-	$sql = mysql_query($sql);
+								FROM {$table_prefix}mlm_users";
+								
+	$results = $wpdb->get_results($sql);
 	$user_id = '';
-	while($row = mysql_fetch_array($sql))
+
+	foreach($results as $row)
 	{
-		$user_id .= $row['user_id'].",";
+		$user_id .= $row->user_id.",";
 	}
 	$user_id = substr($user_id, 0, -1);
 	

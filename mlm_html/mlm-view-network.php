@@ -211,7 +211,7 @@ class BinaryTree
 		}*/
 		if(!checkKey($key))
 		{?>
-		<p style="margin:0 auto;padding:0px;font-family:Arial, Helvetica, sans-serif;font-size:20px; text-align:center; font-weight:bold; padding:25px 0px 15px 0px;color:grey;">There has been an error while generating this tree. <br>Please contact the system admin at support@clubtorofx.com to report this problem.</p>
+		<p style="margin:0 auto;padding:0px;font-family:Arial, Helvetica, sans-serif;font-size:20px; text-align:center; font-weight:bold; padding:25px 0px 15px 0px;color:grey;">There has been an error while generating this tree. <br>Please contact the system admin at <?= get_settings('admin_email') ?> to report this problem.</p>
 		<?php
 			exit;
 		}

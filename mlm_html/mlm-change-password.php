@@ -42,7 +42,7 @@ function mlm_change_password()
 		
 	echo $msg;
 ?>
-<script type="text/javascript" src="<?= plugins_url().'/mlm/js/form-validation.js'?>"></script>
+<script type="text/javascript" src="<?= plugins_url().'/'.MLM_PLUGIN_NAME.'/js/form-validation.js'?>"></script>
 
 <span style='color:red;'><?=$error?></span>
 <table border="0" cellpadding="0" cellspacing="0" width="100%">

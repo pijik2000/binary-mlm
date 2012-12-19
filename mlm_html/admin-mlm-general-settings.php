@@ -1,6 +1,7 @@
 <?php
 function mlmGeneral()
 {
+	global $wpdb;	
 	//get database table prefix
 	$table_prefix = mlm_core_get_table_prefix();
 	
@@ -51,14 +52,15 @@ function mlmGeneral()
 			<td>
 			<?php
 				$sql = "SELECT iso3, currency 
-						FROM {$table_prefix}mlm_currency 
-						ORDER BY iso3";
-				$sql = mysql_query($sql);
+											FROM {$table_prefix}mlm_currency 
+											ORDER BY iso3";
+				$results = $wpdb->get_results($sql);
 			?>
 				<select name="currency" id="currency" >
 					<option value="">Select Currency</option>
 				<?php
-					while($row = mysql_fetch_object($sql))
+					
+					foreach($results as $row)
 					{
 						if($_POST['currency']==$row->iso3)
 							$selected = 'selected';

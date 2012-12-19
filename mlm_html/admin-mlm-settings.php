@@ -10,14 +10,13 @@ require_once("admin-mlm-payout-run.php");
 
 function adminMLMSettings()
 {	
-	global $pagenow;
+	global $pagenow, $wpdb;
 	$table_prefix = mlm_core_get_table_prefix();
 	
 	$sql = "SELECT COUNT(*) AS num FROM {$table_prefix}mlm_users";
-	$sql = mysql_query($sql);
-	$num = mysql_fetch_array($sql);
+	$num = $wpdb->get_var($sql);
 	
-	if($num['num'] == 0)
+	if($num == 0)
 	{
 		$tabs = array( 
 						'createuser' => 'Create First User', 

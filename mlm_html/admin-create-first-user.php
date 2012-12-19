@@ -3,6 +3,7 @@ error_reporting(0);
 require_once("php-form-validation.php");
 function register_first_user()
 { 
+	global $wpdb;	
 	//get database table prefix
 	$table_prefix = mlm_core_get_table_prefix();
 	
@@ -72,16 +73,16 @@ function register_first_user()
 				
 				//insert the data into fa_user table
 				$insert = "INSERT INTO {$table_prefix}mlm_users
-						   (
-								user_id, username, user_key, parent_key, sponsor_key, leg
-							) 
-							VALUES
-							(
-								'".$user_id."','".$username."', '".$user_key."', '0', '0', '0'
-							)";
+						   					(
+																user_id, username, user_key, parent_key, sponsor_key, leg
+													) 
+													VALUES
+													(
+															'".$user_id."','".$username."', '".$user_key."', '0', '0', '0'
+													)";
 							
 				// if all data successfully inserted
-				if(mysql_query($insert))
+				if($wpdb->query($insert))
 				{
 					$chk = '';
 					//$msg = "<span style='color:green;'>Congratulations! You have successfully registered in the system.</span>";

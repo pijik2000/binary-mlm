@@ -18,8 +18,10 @@ global $wpdb;
 
 // Path and URL
 if ( !defined( 'MLM_PLUGIN_DIR' ) )
-	define( 'MLM_PLUGIN_DIR', WP_PLUGIN_DIR . '/mlm' );
+	define( 'MLM_PLUGIN_DIR', WP_PLUGIN_DIR . '/binary-mlm' );
 	
+if ( !defined( 'MLM_PLUGIN_NAME' ) )
+	define( 'MLM_PLUGIN_NAME', 'binary-mlm' );	
 //include the the core funcitons file
 require_once(MLM_PLUGIN_DIR. '/mlm-constant.php');
 
