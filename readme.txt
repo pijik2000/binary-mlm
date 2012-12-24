@@ -33,6 +33,8 @@ Features:
 
 Check out Binary MLM Pro and Binary MLM e-Commerce at <a href="http://wordpressmlm.com" target="_blank">http://wordpressmlm.com</a>
 
+If you have any support issue related to Binary MLM, please write to us at <a href="mailto:support@wordpressmlm.com">support@wordpressmlm.com</a>
+
 == Installation ==
 
 1. Place the 'binary-mlm' folder in your '/wp-content/plugins/' directory.
