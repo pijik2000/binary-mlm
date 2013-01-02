@@ -77,7 +77,7 @@ function setPagingButtonsConfiguration(value) {
     	<!--va-matterbox-->
     	<div class="va-matterbox">
         	<!--va-headname-->
-        	<div class="va-headname">My Left Group Details</div>
+        	<div class="va-headname">My Personal Group Details</div>
             <!--/va-headname-->
 			<div class="va-admin-leg-details">
             	<!--va-admin-mid-->
