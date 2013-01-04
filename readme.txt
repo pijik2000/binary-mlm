@@ -6,7 +6,7 @@ Tags: MLM, multi level marketing, network marketing, binary network,
 binary MLM
 Requires at least: 3.3
 Tested up to: 3.5
-Stable tag: 1.0.1
+Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,9 +57,11 @@ The plugin gives you the option to choose the base currency for your network. Ho
 
 == Changelog ==
 
-1.0.1
+= 1.1.0 =
 
-Updated some text labels on the user frontend
+* Updated some incorrect text labels on the user frontend pages.
+* Created the User Reports Page in the admin to demonstrate the capability of Binary MLM Pro
+* Run Payouts section updated to demonstrate the capability of Binary MLM Pro
 
 == Upgrade notice ==
 

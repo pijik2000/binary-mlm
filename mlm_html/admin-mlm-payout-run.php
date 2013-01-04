@@ -38,6 +38,7 @@ function adminMLMPayout()
 		
 		<p><?= plugins_url()."/".MLM_PLUGIN_NAME?>/cronjobs/paycycle.php</p>
 		
+		<?php requiredProVersionFullPayout()?>
 		
 	</div>
 	<div class="forms-ui">

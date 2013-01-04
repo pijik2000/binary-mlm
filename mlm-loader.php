@@ -22,6 +22,8 @@ if ( !defined( 'MLM_PLUGIN_DIR' ) )
 	
 if ( !defined( 'MLM_PLUGIN_NAME' ) )
 	define( 'MLM_PLUGIN_NAME', 'binary-mlm' );	
+
+define( 'MLM_URL', plugins_url( '', __FILE__ ) );
 //include the the core funcitons file
 require_once(MLM_PLUGIN_DIR. '/mlm-constant.php');
 
@@ -77,6 +79,9 @@ require_once(MLM_PLUGIN_DIR. '/mlm_html/mlm-change-password.php');
 
 //in this file admin can change the user's profile details
 require_once(MLM_PLUGIN_DIR. '/mlm_html/admin-user-update-profile.php');
+
+//in this file admin can see the user's report
+require_once(MLM_PLUGIN_DIR. '/mlm_html/admin-user-account.php');
 
 /* Runs when plugin is activated */
 register_activation_hook(__FILE__, 'mlm_install');

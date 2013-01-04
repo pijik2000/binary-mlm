@@ -5,10 +5,10 @@ function getuseridbykey($key)
 	$table_prefix = mlm_core_get_table_prefix();
 	global $wpdb;
 	$id = $wpdb->get_var("
-																								SELECT id 
-																								FROM {$table_prefix}mlm_users 
-																								WHERE `user_key` = '".$key."'
-																					");
+							SELECT id 
+							FROM {$table_prefix}mlm_users 
+							WHERE `user_key` = '".$key."'
+				");
 	return $id;
 }
 
@@ -52,10 +52,10 @@ function get_current_user_key()
 	$username = $current_user->user_login;
 
 	$user_key = $wpdb->get_var("
-																												SELECT user_key 
-																												FROM {$table_prefix}mlm_users 
-																												WHERE username = '".$username."'
-																								");
+								SELECT user_key 
+								FROM {$table_prefix}mlm_users 
+								WHERE username = '".$username."'
+					");
 	return $user_key;
 }
 
@@ -70,10 +70,10 @@ function getUserIdByUsername()
 	$username = $current_user->user_login;
 
 	$id = $wpdb->get_var("
-																						SELECT id 
-																						FROM {$table_prefix}mlm_users 
-																						WHERE username = '".$username."'
-																				");
+							SELECT id 
+							FROM {$table_prefix}mlm_users 
+							WHERE username = '".$username."'
+					");
 	return $id;
 }
 
@@ -82,12 +82,12 @@ function checkKey($key)
 	$table_prefix = mlm_core_get_table_prefix();
 	global $wpdb;
 	$user_key = $wpdb->get_var("
-																											SELECT user_key 
-						 																					FROM {$table_prefix}mlm_users 
-						  																				WHERE `user_key` = '".$key."' 
-						  																				AND banned = '0'
-																									");
-	if(!$user_key)
+								SELECT user_key 
+								FROM {$table_prefix}mlm_users 
+								WHERE `user_key` = '".$key."' 
+								AND banned = '0'
+						");
+if(!$user_key)
 			return false;
 	
 	return true;
@@ -99,11 +99,11 @@ function checkallowed($key,$leg=NULL)
 	$table_prefix = mlm_core_get_table_prefix();
 	
 	$username = $wpdb->get_var("
-																													SELECT username 
-						  																						FROM {$table_prefix}mlm_users 
-						 																							WHERE leg = '".$leg."' 
-						  																						AND parent_key = '".$key."'
-																									");
+									SELECT username 
+								FROM {$table_prefix}mlm_users 
+									WHERE leg = '".$leg."' 
+								AND parent_key = '".$key."'
+					");
 	return $wpdb->num_rows;
 }
 
@@ -112,10 +112,10 @@ function totalLeftLegUsers($pkey)
 	global $wpdb;	
 	$table_prefix = mlm_core_get_table_prefix();
 	$num = $wpdb->get_var("
-																							SELECT COUNT(*) AS num
-																							FROM {$table_prefix}mlm_leftleg
-																							WHERE pkey = '".$pkey."'
-																				");
+							SELECT COUNT(*) AS num
+							FROM {$table_prefix}mlm_leftleg
+							WHERE pkey = '".$pkey."'
+				");
 	return $num;
 }
 
@@ -124,10 +124,10 @@ function totalRightLegUsers($pkey)
 	global $wpdb;	
 	$table_prefix = mlm_core_get_table_prefix();
 	$num = $wpdb->get_var("
-																							SELECT COUNT(*) AS num
-																							FROM {$table_prefix}mlm_rightleg
-																							WHERE pkey = '".$pkey."'
-																				");
+						SELECT COUNT(*) AS num
+						FROM {$table_prefix}mlm_rightleg
+						WHERE pkey = '".$pkey."'
+			");
 	return $num;
 }
 
@@ -137,16 +137,16 @@ function activeUsersOnLeftLeg($pkey)
 	$table_prefix = mlm_core_get_table_prefix();
 
 	$num = $wpdb->get_var("
-																								SELECT COUNT(*) AS num
-																								FROM {$table_prefix}mlm_users
-																								WHERE payment_status = '1'
-																								AND user_key IN
-																								(
-																												SELECT ukey 
-																												FROM {$table_prefix}mlm_leftleg
-																												WHERE pkey = '".$pkey."'
-																								)
-																					");
+						SELECT COUNT(*) AS num
+						FROM {$table_prefix}mlm_users
+						WHERE payment_status = '1'
+						AND user_key IN
+						(
+										SELECT ukey 
+										FROM {$table_prefix}mlm_leftleg
+										WHERE pkey = '".$pkey."'
+						)
+			");
 	return $num;
 }
 
@@ -156,16 +156,16 @@ function activeUsersOnRightLeg($pkey)
 	$table_prefix = mlm_core_get_table_prefix();
 
 	$num = $wpdb->get_var("
-																								SELECT COUNT(*) AS num
-																								FROM {$table_prefix}mlm_users
-																								WHERE payment_status = '1'
-																								AND user_key IN
-																								(
-																												SELECT ukey 
-																												FROM {$table_prefix}mlm_rightleg
-																												WHERE pkey = '".$pkey."'
-																								)
-																				");
+							SELECT COUNT(*) AS num
+							FROM {$table_prefix}mlm_users
+							WHERE payment_status = '1'
+							AND user_key IN
+							(
+											SELECT ukey 
+											FROM {$table_prefix}mlm_rightleg
+											WHERE pkey = '".$pkey."'
+							)
+			");
 	return $num;
 }
 
@@ -175,10 +175,10 @@ function totalMyPersonalSales($sponsor)
 	$table_prefix = mlm_core_get_table_prefix();
 
 	$num = $wpdb->get_var("
-																								SELECT COUNT(*) AS num
-																								FROM {$table_prefix}mlm_users
-																								WHERE sponsor_key = '".$sponsor."'
-																				");
+							SELECT COUNT(*) AS num
+							FROM {$table_prefix}mlm_users
+							WHERE sponsor_key = '".$sponsor."'
+			");
 	return $num;
 }
 
@@ -187,11 +187,11 @@ function activeUsersOnPersonalSales($sponsor)
 	global $wpdb;		
 	$table_prefix = mlm_core_get_table_prefix();
 	$num = $wpdb->get_var("
-																							SELECT COUNT(*) AS num
-																							FROM {$table_prefix}mlm_users
-																							WHERE sponsor_key = '".$sponsor."'
-																							AND payment_status = '1'
-																				");
+							SELECT COUNT(*) AS num
+							FROM {$table_prefix}mlm_users
+							WHERE sponsor_key = '".$sponsor."'
+							AND payment_status = '1'
+				");
 	return $num;
 }
 
@@ -588,11 +588,11 @@ function mlmDistributeCommission()
 
 	//select all active users and give commision to their parents
 	$results = $wpdb->get_results("
-																															SELECT user_key FROM {$table_prefix}mlm_users 
-																															WHERE payment_status= '1' 
-																															AND banned = '0'
-																															ORDER BY id
-																												");
+									SELECT user_key FROM {$table_prefix}mlm_users 
+									WHERE payment_status= '1' 
+									AND banned = '0'
+									ORDER BY id
+						");
 	$num = $wpdb->num_rows;
 	if($num)
 	{
@@ -624,12 +624,12 @@ function mlmIsEligibleForCommission($key)
 	$rightusers =0; 
 	
 	$results = $wpdb->get_results("
-																														SELECT user_key 
-																														FROM {$table_prefix}mlm_users 
-																														WHERE banned = '0' 
-																														AND payment_status = '1' 
-																														AND sponsor_key = '".$key."'
-			  																							");
+								SELECT user_key 
+								FROM {$table_prefix}mlm_users 
+								WHERE banned = '0' 
+								AND payment_status = '1' 
+								AND sponsor_key = '".$key."'
+				");
 	$num = $wpdb->num_rows;
 	
 	if($num)
@@ -637,21 +637,21 @@ function mlmIsEligibleForCommission($key)
 		foreach($results as $data)
 		{
 			$lactive = $wpdb->get_var("
-																													SELECT COUNT(*) AS lactive 
-																													FROM {$table_prefix}mlm_leftleg 
-																													WHERE ukey = '".$data->user_key."' 
-																													AND pkey = '".$key."'
-							  																		");
+										SELECT COUNT(*) AS lactive 
+										FROM {$table_prefix}mlm_leftleg 
+										WHERE ukey = '".$data->user_key."' 
+										AND pkey = '".$key."'
+						");
 			
 			if($lactive >= 1)
 				$leftusers++;		
 					
 			$ractive = $wpdb->get_var("
-																												SELECT COUNT(*) AS ractive 
-																												FROM {$table_prefix}mlm_rightleg 
-																												WHERE ukey = '".$data->user_key."' 
-																												AND pkey = '".$key."'
-																									");
+										SELECT COUNT(*) AS ractive 
+										FROM {$table_prefix}mlm_rightleg 
+										WHERE ukey = '".$data->user_key."' 
+										AND pkey = '".$key."'
+							");
 			
 			if($ractive >= 1)
 				$rightusers++;
@@ -687,15 +687,15 @@ function mlmCalculateCommission($pkey)
 				
 	//check users from left leg table 
 	$leftquery = $wpdb->get_results("
-								  																						SELECT  ukey 
-								  																						FROM {$table_prefix}mlm_leftleg, {$table_prefix}mlm_users 
-								  																						WHERE user_key = ukey 
-								  																						AND pkey = '".$pkey."' 
-								  																						AND commission_status = '0' 
-								  																						AND payment_status = '1'  
-								  																						ORDER BY {$table_prefix}mlm_users.id 
-								  																						LIMIT {$pair1}
-																													");
+									SELECT  ukey 
+									FROM {$table_prefix}mlm_leftleg, {$table_prefix}mlm_users 
+									WHERE user_key = ukey 
+									AND pkey = '".$pkey."' 
+									AND commission_status = '0' 
+									AND payment_status = '1'  
+									ORDER BY {$table_prefix}mlm_users.id 
+									LIMIT {$pair1}
+								");
 								  
 	$leftno = $wpdb->num_rows;
 	if($leftno >= $pair1)
@@ -720,12 +720,12 @@ function mlmCalculateCommission($pkey)
 			foreach($leftquery as $leftresult)
 			{
 				$leftupdate = $wpdb->query("
-																															UPDATE {$table_prefix}mlm_leftleg 
-																															SET commission_status = '1' 
-										   																			WHERE pkey = '".$pkey."' 
-										   																			AND ukey = '".$leftresult->ukey."' 
-										   																			LIMIT 1
-																											");
+							UPDATE {$table_prefix}mlm_leftleg 
+							SET commission_status = '1' 
+					WHERE pkey = '".$pkey."' 
+					AND ukey = '".$leftresult->ukey."' 
+					LIMIT 1
+			");
 											
 				$childs .= mlmGetUserNameByKey($leftresult->ukey).",";
 			}
@@ -749,10 +749,10 @@ function mlmCalculateCommission($pkey)
 			$parent_id = getuseridbykey($pkey);
 			
 			$num = $wpdb->get_var("
-																									SELECT COUNT(*) AS num 
-																									FROM {$table_prefix}mlm_commission 
-																									WHERE parent_id = $parent_id
-												 										");
+						SELECT COUNT(*) AS num 
+						FROM {$table_prefix}mlm_commission 
+						WHERE parent_id = $parent_id
+			");
 			
 			if($num >= $initial_pair)
 				$amount = $further_amount;
@@ -763,15 +763,15 @@ function mlmCalculateCommission($pkey)
 			
 			//deduct service charge and tds
 			$insert = $wpdb->query("
-																											INSERT INTO {$table_prefix}mlm_commission 
-																											(
-																														id, date_notified, parent_id, child_ids, amount
-																											) 
-																											VALUES 
-																											(
-																															NULL, '".$date."', '".$parent_id."', '".$child_ids."', '".$amount."'										
-																											)
-																							");	
+				INSERT INTO {$table_prefix}mlm_commission 
+				(
+							id, date_notified, parent_id, child_ids, amount
+				) 
+				VALUES 
+				(
+								NULL, '".$date."', '".$parent_id."', '".$child_ids."', '".$amount."'										
+				)
+");	
 		}
 	}
 
@@ -781,15 +781,15 @@ function mlmCalculateCommission($pkey)
 
 	//check users from rgt leg table
 	$rightquery = $wpdb->get_results("
-								   																										SELECT ukey 
-								   																										FROM {$table_prefix}mlm_rightleg, {$table_prefix}mlm_users
-								   																										WHERE user_key = ukey 
-								   																										AND pkey = '".$pkey."' 
-								   																										AND commission_status = '0' 
-								   																										AND payment_status = '1' 
-								   																										ORDER BY {$table_prefix}mlm_users.id 
-								   																										LIMIT {$pair1}
-							 																							"); 
+									SELECT ukey 
+									FROM {$table_prefix}mlm_rightleg, {$table_prefix}mlm_users
+									WHERE user_key = ukey 
+									AND pkey = '".$pkey."' 
+									AND commission_status = '0' 
+									AND payment_status = '1' 
+									ORDER BY {$table_prefix}mlm_users.id 
+									LIMIT {$pair1}
+					"); 
 							   
 	$rgtno = $wpdb->num_rows;
 										
@@ -797,15 +797,15 @@ function mlmCalculateCommission($pkey)
 	{	
 		//check users from rgt leg table 
 		$leftquery = $wpdb->get_results("
-									  																											SELECT ukey
-									  																											FROM {$table_prefix}mlm_leftleg, {$table_prefix}mlm_users
-									  																											WHERE user_key = ukey 
-									  																											AND pkey = '".$pkey."' 
-									  																											AND commission_status = '0' 
-									  																											AND payment_status = '1' 
-									  																											ORDER BY {$table_prefix}mlm_users.id
-									  																											LIMIT {$pair2}
-																															");
+								SELECT ukey
+								FROM {$table_prefix}mlm_leftleg, {$table_prefix}mlm_users
+								WHERE user_key = ukey 
+								AND pkey = '".$pkey."' 
+								AND commission_status = '0' 
+								AND payment_status = '1' 
+								ORDER BY {$table_prefix}mlm_users.id
+								LIMIT {$pair2}
+			");
 								  
 		$leftno = $wpdb->num_rows;
 					
@@ -831,12 +831,12 @@ function mlmCalculateCommission($pkey)
 			foreach($leftquery as $leftresult)
 			{
 				$leftupdate = $wpdb->query("
-																															UPDATE {$table_prefix}mlm_leftleg 
-																															SET commission_status = '1' 
-										   																			WHERE pkey = '".$pkey."' 
-																															AND ukey = '".$leftresult->ukey."' 
-																															LIMIT 1
-																												");
+										UPDATE {$table_prefix}mlm_leftleg 
+										SET commission_status = '1' 
+								WHERE pkey = '".$pkey."' 
+										AND ukey = '".$leftresult->ukey."' 
+										LIMIT 1
+							");
 											
 				$childs .= mlmGetUserNameByKey($leftresult->ukey).",";
 			}
@@ -845,11 +845,11 @@ function mlmCalculateCommission($pkey)
 			$parent_id = getuseridbykey($pkey);
 			
 			$num = $wpdb->get_var("
-																											SELECT COUNT(*) AS num 
-																											FROM {$table_prefix}mlm_commission 
-																											WHERE parent_id = $parent_id
-												 										");
-			
+								SELECT COUNT(*) AS num 
+								FROM {$table_prefix}mlm_commission 
+								WHERE parent_id = $parent_id
+			");
+
 			if($num >= $initial_pair)
 				$amount = $further_amount;
 			else
@@ -858,15 +858,15 @@ function mlmCalculateCommission($pkey)
 			$child_ids = $childs;
 			
 			$insert = $wpdb->query("
-																											INSERT INTO {$table_prefix}mlm_commission 
-																											(
-																														id, date_notified, parent_id, child_ids, amount
-																											) 
-																											VALUES
-																											(
-																															NULL, '".$date."', '".$parent_id."', '".$child_ids."', '".$amount."'
-																											)
-																							");
+				INSERT INTO {$table_prefix}mlm_commission 
+				(
+							id, date_notified, parent_id, child_ids, amount
+				) 
+				VALUES
+				(
+								NULL, '".$date."', '".$parent_id."', '".$child_ids."', '".$amount."'
+				)
+	");
 								
 								
 		}
@@ -881,10 +881,10 @@ function mlmGetUserNameByKey($key)
 	$table_prefix = mlm_core_get_table_prefix();
 	
 	$username = $wpdb->get_var("
-																												SELECT username 
-			  									 															FROM {$table_prefix}mlm_users 
-			   									 														WHERE user_key = '".$key."'
-																								");
+								SELECT username 
+							FROM {$table_prefix}mlm_users 
+						WHERE user_key = '".$key."'
+				");
 																								
 		return $username;
 }
@@ -899,11 +899,11 @@ function mlmDistributeBonus()
 	
 	//select all active users and give commision to their parents
 	$query = $wpdb->get_results("
-																													SELECT user_key FROM {$table_prefix}mlm_users 
-																													WHERE payment_status= '1' 
-																													AND banned = '0'
-																													ORDER BY id
-																									");
+									SELECT user_key FROM {$table_prefix}mlm_users 
+									WHERE payment_status= '1' 
+									AND banned = '0'
+									ORDER BY id
+					");
 	$num = $wpdb->num_rows;
 	
 	if($num)
@@ -931,34 +931,34 @@ function mlmCalculateBonus($key)
 	{
 		//count total direct referrals
 		$query = $wpdb->get_var("
-																									SELECT COUNT(*) AS num 
-																									FROM {$table_prefix}mlm_users
-																									WHERE sponsor_key = '".$key."'
-																									AND payment_status = '1'
-																									AND banned = '0'
-																							");
+								SELECT COUNT(*) AS num 
+								FROM {$table_prefix}mlm_users
+								WHERE sponsor_key = '".$key."'
+								AND payment_status = '1'
+								AND banned = '0'
+						");
 		$bonus_slab = $query;
 	}
 	else if($mlm_bonus['bonus_criteria'] == 'pair')
 	{		
 		//count total active users on left leg
 		$leftcount = $wpdb->get_var("
-																												SELECT COUNT(*) AS num 
-														                FROM {$table_prefix}mlm_leftleg, {$table_prefix}mlm_users
-														                WHERE user_key = ukey
-														                AND pkey = '".$key."'
-														                AND payment_status = '1'
-														                AND banned = '0'
-												                ");
+					SELECT COUNT(*) AS num 
+					FROM {$table_prefix}mlm_leftleg, {$table_prefix}mlm_users
+					WHERE user_key = ukey
+					AND pkey = '".$key."'
+					AND payment_status = '1'
+					AND banned = '0'
+			");
 		//count total active users on right leg							  
 		$rightcount = $wpdb->get_var("
-														                 SELECT COUNT(*) AS num 
-														                 FROM {$table_prefix}mlm_rightleg, {$table_prefix}mlm_users
-														                 WHERE user_key = ukey
-														                 AND pkey = '".$key."'
-														                 AND payment_status = '1'
-														                 AND banned = '0'
-												                  ");
+								 SELECT COUNT(*) AS num 
+								 FROM {$table_prefix}mlm_rightleg, {$table_prefix}mlm_users
+								 WHERE user_key = ukey
+								 AND pkey = '".$key."'
+								 AND payment_status = '1'
+								 AND banned = '0'
+						  ");
 		//count total numbers of active pair							  
 		$paircase1 = getPair($leftcount, $rightcount);
 		$paircase2 = getPair($rightcount, $leftcount);
@@ -1023,10 +1023,10 @@ function distributeBonusSlab($mlm_user_id)
 	//count how many times bonus have been paid by the system previously
 	
 	$cb = $wpdb->get_var("
-																							SELECT COUNT(*) AS num
-																							FROM {$table_prefix}mlm_bonus
-																							WHERE mlm_user_id = '".$mlm_user_id."'
-																			");
+							SELECT COUNT(*) AS num
+							FROM {$table_prefix}mlm_bonus
+							WHERE mlm_user_id = '".$mlm_user_id."'
+			");
 	return $cb;
 }
 
@@ -1040,15 +1040,15 @@ function insertBonusSlab($mlm_user_id, $amount)
 	//$payable_amount_array = calculateTdsAndServiceCharge($amount);
 	
 	$insert = $wpdb->query("
-																								INSERT INTO {$table_prefix}mlm_bonus
-																								(
-																												id, date_notified, mlm_user_id, amount
-																								)
-																								VALUES
-																								(
-																												NULL, '".$date."', '".$mlm_user_id."', '".$amount."'
-																								)
-						 															");
+						INSERT INTO {$table_prefix}mlm_bonus
+						(
+										id, date_notified, mlm_user_id, amount
+						)
+						VALUES
+						(
+										NULL, '".$date."', '".$mlm_user_id."', '".$amount."'
+						)
+			");
 }
 /*********************** Here end the code of calculating and distributing bonus ******************************************/
 
@@ -1124,8 +1124,7 @@ function mlm_admin_menu()
 	add_menu_page('WP-MLM-Settings', 'Binary MLM', 1,'admin-settings', 'adminMLMSettings', $icon_url);
 	add_submenu_page('admin-settings','Settings','Settings','1','admin-settings','adminMLMSettings');
 	add_submenu_page('admin-settings','Run Payouts','Run Payouts','administrator','mlm-payout','adminMLMPayout');
-	
-	
+	add_submenu_page('admin-settings','User Report','User Report','administrator','mlm-user-account','adminMLMUserAccount');
 	
 }
 
@@ -1317,6 +1316,42 @@ add_filter('manage_users_custom_column',  'add_payment_status_column_value', 10,
 function add_payment_status( $columns){
     $columns['payment_status'] = __('Payment Status', 'payment_status');
     return $columns;
+}
+
+
+function requiredProVersionUserReport()
+{
+	$msg = '<br><br><br><div class="updated fade"><p><strong>
+	This feature is not available in the FREE version. Please apply for a license key at <a href="http://wordpressmlm.com/binary-mlm-pro" target="_blank">WordpressMLM</a>, if you don\'t have one. If you already have a license key please login to your account at <a href="http://wordpressmlm.com/my-account/" target="_blank">WordpressMLM</a>, copy the license key and paste the same in the License Detail tab in your WP Admin section.</strong></p>
+	<p>In order to view complete details about each user in your Admin section (like the screenshots below), you may consider upgrading to the PRO version of the plugin. You can purchase a license key at <a href="http://wordpressmlm.com/binary-mlm-pro/">WordpressMLM</a></p>
+<table align="center" width="90%" border="0" bordercolor="#E6DB55" cellspacing="10" style="background:white;border:solid 1px #E6DB55;  ">
+  <tr>
+    <td width="50%"><img src="'.MLM_URL.'/images/personal-info.png" align="absmiddle" /></td>
+    <td width="50%"><img src="'.MLM_URL.'/images/left-leg-sales.png" align="absmiddle" /></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="'.MLM_URL.'/images/payout-info.png" align="absmiddle" /><br>
+	<img src="'.MLM_URL.'/images/personal-sales.png" align="absmiddle" /></td>
+    <td width="50%"><img src="'.MLM_URL.'/images/right-leg-sales.png" align="absmiddle" /></td>
+  </tr>
+  
+</table><br />
+<br />
+
+</div>';
+
+	echo $msg; 
+}
+
+function requiredProVersionFullPayout()
+{
+	
+	
+$msg =  '<p style="border:solid 1px #E6DB55; background:#FFFFCC; padding:10px; margin:10px;">In order to view the details of the payout (like the image below) before committing the same, you may consider upgrading to the PRO version of the plugin. You can purchase a license key at <a href="http://wordpressmlm.com/binary-mlm-pro/">WordpressMLM</a>.
+<br /><br /><img src="'.MLM_URL.'/images/payout-view.png" width="715" align="absmiddle" /><br /><br /></p>'; 	
+
+echo $msg; 
+
 }
  
 ?>
