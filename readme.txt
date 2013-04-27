@@ -31,9 +31,9 @@ Features:
 9. Each member is able to see complete details for commission and bonus earned during one payout cycle.
 10. Exhaustive help text on each settings screen.
 
-Check out Binary MLM Pro and Binary MLM e-Commerce at <a href="http://wordpressmlm.com" target="_blank">http://wordpressmlm.com</a>
+Check out Binary MLM Pro and Binary MLM e-Commerce at <a href="http://wpbinarymlm.com" target="_blank">http://wpbinarymlm.com</a>
 
-If you have any support issue related to Binary MLM, please write to us at <a href="mailto:support@wordpressmlm.com">support@wordpressmlm.com</a>
+If you have any support issue related to Binary MLM, please write to us at <a href="mailto:support@wpbinarymlm.com">support@wpbinarymlm.com</a>
 
 == Installation ==
 
