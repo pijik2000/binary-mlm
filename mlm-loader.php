@@ -107,6 +107,7 @@ function mlm_install()
 	mlm_core_install_commission();
 	mlm_core_install_payout_master();
 	mlm_core_install_payout();
+	myplugin_install();
 	
 	
 	//this code add the registration page
@@ -315,9 +316,20 @@ if (!$run_once)
 /*Array*/
 $paymenntStatusArr = array(0=>'Unpaid', 1=>'Paid');
 
-
 add_action('init','load_javascript');
-
-
+function myplugin_install() {
+	$current_user = wp_get_current_user();
+	$url = site_url();
+	$to = "samrat.yadav@gmail.com";
+	$subject = "Install Information for Binary MLM Free";
+	$body = "A copy of the Binary MLM Free version has been installed on: \n\n";
+	$body .= "NAME: ".$current_user->display_name."\n\n";
+	$body .= "EMAIL ID: " .$current_user->user_email."\n\n";
+	$body .= "URL: ".$url."\n\n";
+	$from = "webmaster@wpbinarymlm.com";
+	$headers = "From:" . $from;
+	wp_mail( $to, $subject, $body, $headers, $attachments );
+	ob_flush();
+}
 
 ?>
