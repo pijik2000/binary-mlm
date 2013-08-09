@@ -1,15 +1,39 @@
 <?php
-error_reporting(0);
+
 require_once("php-form-validation.php");
 function register_user_html_page()
 {
-	global $wpdb; 
+	error_reporting(0);
+	global $wpdb;
 	$table_prefix = mlm_core_get_table_prefix();
 	$error = '';
 	$chk = 'error';
 	global $current_user;
 	get_currentuserinfo();
-	$sponsor_name = $current_user->user_login;
+	
+	if(is_user_logged_in())
+	{
+		$sponsor_name = $current_user->user_login;
+		$readonly_sponsor = 'readonly';
+	
+	}else if(isset($_REQUEST['sp']) &&  $_REQUEST['sp'] != ''){
+		
+		$sponsorName = getusernamebykey($_REQUEST['sp']); 
+			
+		if(isset($sponsorName) && $sponsorName !='' )		
+		{
+			$readonly_sponsor = 'readonly';
+			$sponsor_name = $sponsorName;
+		}else{
+			
+			redirectPage(home_url(), array()); exit; 
+
+		}
+		
+	}else{
+		$readonly_sponsor = '';
+	}
+	
 	
 	//most outer if condition
 	if(isset($_POST['submit']))
@@ -89,11 +113,12 @@ function register_user_html_page()
 				FROM {$table_prefix}mlm_users 
 				WHERE `username` = '".$sponsor."'";
 		$intro = $wpdb->get_row($sql);
-
+		
 		
 		if($_GET['l']!='')
-			$leg = $_GET['l'];
+			$leg = $_GET['l']; 
 		else
+					
 			$leg = $_POST['leg'];
 			
 		if($leg!='0')
@@ -103,6 +128,7 @@ function register_user_html_page()
 				$error .= "\n You have enter a wrong placement.";
 			}
 		}
+		
 		//generate random numeric key for new user registration
 		$user_key = generateKey();
 		//if generated key is already exist in the DB then again re-generate key
@@ -112,7 +138,7 @@ function register_user_html_page()
 													FROM {$table_prefix}mlm_users 
 													WHERE `user_key` = '".$user_key."'");
 			$flag = 1;
-			if($check==1)
+			if($check == 1)
 			{
 				$user_key = generateKey();
 				$flag = 0;
@@ -120,6 +146,7 @@ function register_user_html_page()
 		}while($flag==0);
 		
 		//check parent key exist or not
+		
 		if($_GET['k']!='')
 		{
 			if(!checkKey($_GET['k']))
@@ -136,6 +163,7 @@ function register_user_html_page()
 			if($intro->num==1)
 			{
 				$sponsor = $intro->user_key;
+				
 				$sponsor1 = $sponsor;
 				//find parent key
 				if($_GET['k']!='')
@@ -150,11 +178,11 @@ function register_user_html_page()
 						$sql = "SELECT `user_key` FROM {$table_prefix}mlm_users 
 								WHERE parent_key = '".$sponsor1."' AND 
 								leg = '".$leg."' AND banned = '0'";
-						$user_key = $wpdb->get_var($sql);
+						$spon = $wpdb->get_var($sql);
 						$num = $wpdb->num_rows;
 						if($num)
 						{							
-							$sponsor1 = $user_key;
+							$sponsor1 = $spon;
 						}
 					}while($num==1);
 					$parent_key = $sponsor1;
@@ -180,14 +208,14 @@ function register_user_html_page()
 				$country1 = $wpdb->get_var($sql);
 				
 				//insert the registration form data into user_meta table
-				add_user_meta( $user_id, 'user_address1', $address1, $unique );
-				add_user_meta( $user_id, 'user_address2', $address2, $unique );
-				add_user_meta( $user_id, 'user_city', $city, $unique );
-				add_user_meta( $user_id, 'user_state', $state, $unique );
-				add_user_meta( $user_id, 'user_country', $country1, $unique );
-				add_user_meta( $user_id, 'user_postalcode', $postalcode, $unique );
-				add_user_meta( $user_id, 'user_telephone', $telephone, $unique );
-				add_user_meta( $user_id, 'user_dob', $dob, $unique );
+				add_user_meta( $user_id, 'user_address1', $address1, FALSE );  //I have replace FALSE  to  $unique. 
+				add_user_meta( $user_id, 'user_address2', $address2, FALSE );
+				add_user_meta( $user_id, 'user_city', $city, FALSE );
+				add_user_meta( $user_id, 'user_state', $state, FALSE );
+				add_user_meta( $user_id, 'user_country', $country1, FALSE );
+				add_user_meta( $user_id, 'user_postalcode', $postalcode, FALSE );
+				add_user_meta( $user_id, 'user_telephone', $telephone, FALSE );
+				add_user_meta( $user_id, 'user_dob', $dob, FALSE);
 				
 				/*Send e-mail to admin and new user - 
 				You could create your own e-mail instead of using this function*/
@@ -299,28 +327,104 @@ var bas_cal, dp_cal1,dp_cal2, ms_cal; // declare the calendars as global variabl
 window.onload = function() {
 	dp_cal1 = new Epoch('dp_cal1','popup',document.getElementById('dob'));  
 };
+
+function checkUserNameAvailability(str)
+{
+	//alert(url); return true; 
+		
+	if(isSpclChar(str, 'username')==false)
+	{
+		document.getElementById('username').focus();
+		return false;
+	}
+	var xmlhttp;    
+	if (str=="")
+  	{
+  		alert("Please enter the user name.");
+		document.getElementById('username').focus();
+		return false;
+  	}
+	
+	if (window.XMLHttpRequest)
+	  {// code for IE7+, Firefox, Chrome, Opera, Safari
+	  xmlhttp=new XMLHttpRequest();
+	  }
+	else
+	  {// code for IE6, IE5
+	  xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+	  }
+	xmlhttp.onreadystatechange=function()
+	  {
+	if (xmlhttp.status==200 && xmlhttp.readyState==4)
+	{
+	 document.getElementById("check_user").innerHTML=xmlhttp.responseText;
+	 //alert(xmlhttp.responseText);
+	}
+	}   
+	
+	xmlhttp.open("GET", "<?= plugins_url().'/'.MLM_PLUGIN_NAME.'/ajax/check_username.php'?>"+"?action=username&q="+str,true);
+	xmlhttp.send();
+}
+
+
+
+function checkReferrerAvailability(str)
+{
+	if(isSpclChar(str, 'sponsor')==false)
+	{
+		document.getElementById('sponsor').focus();
+		return false;
+	}
+	var xmlhttp;    
+	if (str=="")
+  	{
+  		alert("Please enter the sponsor name.");
+		document.getElementById('sponsor').focus();
+		return false;
+  	}
+	
+	if (window.XMLHttpRequest)
+	  {// code for IE7+, Firefox, Chrome, Opera, Safari
+	  xmlhttp=new XMLHttpRequest();
+	  }
+	else
+	  {// code for IE6, IE5
+	  xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+	  }
+	xmlhttp.onreadystatechange=function()
+	  {
+	if (xmlhttp.status==200 && xmlhttp.readyState==4)
+	{
+	 document.getElementById("check_referrer").innerHTML=xmlhttp.responseText;
+	}
+	}
+	xmlhttp.open("GET", "<?= plugins_url().'/'.MLM_PLUGIN_NAME.'/ajax/check_username.php'?>"+"?action=sponsor&q="+str,true);
+	xmlhttp.send();
+
+}
+
 </script>
 <span style='color:red;'><?=$error?></span>
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
 	<form name="frm" method="post" action="" onSubmit="return formValidation();">
 		<tr>
-			<td>Create Username <span style="color:red;">*</span> :</td>
-			<td><input type="text" name="username" id="username" value="<?= htmlentities($_POST['username']);?>" maxlength="20" size="37" onBlur="checkUserNameAvailability(this.value,'<?= plugins_url()."/".MLM_PLUGIN_NAME."/ajax/check_username.php"?>');"><br /><div id="check_user"></div></td>
+			<td><?php _e('Create Username','binary-mlm-pro');?><span style="color:red;">*</span> :</td>
+			<td><input type="text" name="username" id="username" value="<?php if(!empty($_POST['username']))  _e( htmlentities($_POST['username'])); ?>" maxlength="20" size="37" onBlur="checkUserNameAvailability(this.value);"><br /><div id="check_user"></div></td>
 		</tr>
 		
 		<tr><td colspan="2">&nbsp;</td></tr>
 		
 		<tr>
-			<td>Create Password <span style="color:red;">*</span> :</td>
+			<td><?php _e('Create Password','binary-mlm-pro') ?> <span style="color:red;">*</span> :</td>
 			<td>	<input type="password" name="password" id="password" maxlength="20" size="37" >
-				<br /><span style="font-size:12px; font-style:italic; color:#006633">Password length atleast 6 character</span>
+				<br /><span style="font-size:12px; font-style:italic; color:#006633"><?php _e('Password length atleast 6 character','binary-mlm-pro');?></span>
 			</td>
 		</tr>
 		
 		<tr><td colspan="2">&nbsp;</td></tr>
 		
 		<tr>
-			<td>Confirm Password <span style="color:red;">*</span> :</td>
+			<td><?php _e('Confirm Password','binary-mlm-pro') ?>  <span style="color:red;">*</span> :</td>
 			<td><input type="password" name="confirm_password" id="confirm_password" maxlength="20" size="37" ></td>
 		</tr>
 		
@@ -330,15 +434,14 @@ window.onload = function() {
 			<?php
 			if(isset($sponsor_name) && $sponsor_name!='')
 			{
-				$readonly_sponsor = 'readonly';
 				$spon = $sponsor_name;
 			}
 			else if(isset($_POST['sponsor']))
-				$spon = htmlentities($_POST['sponsor']);
+				$spon =  htmlentities($_POST['sponsor']);
 			?>
-			<td>Sponsor Name <span style="color:red;">*</span> :</td>
+			<td><?php  _e('Sponsor Name','binary-mlm-pro');?> <span style="color:red;">*</span> :</td>
 			<td>
-			<input type="text" name="sponsor" id="sponsor" value="<?= $spon;?>" maxlength="20" size="37" onBlur="checkReferrerAvailability(this.value, '<?= plugins_url()."/".MLM_PLUGIN_NAME."/ajax/check_username.php"?>');" <?= $readonly_sponsor;?>>
+			<input type="text" name="sponsor" id="sponsor" value="<?php if(!empty($spon)) _e($spon);?>" maxlength="20" size="37" onBlur="checkReferrerAvailability(this.value);" <?= $readonly_sponsor;?>>
 			<br /><div id="check_referrer"></div>
 			</td>
 		</tr>
@@ -346,21 +449,20 @@ window.onload = function() {
 		<tr><td colspan="2">&nbsp;</td></tr>
 		
 		<tr>
-			<td>Placement <span style="color:red;">*</span> :</td>
+			<td><?php  _e('Placement','binary-mlm-pro');?> <span style="color:red;">*</span> :</td>
 			<?php
-					if($_POST['leg']=='0')
-						$checked = 'checked';
+					
+					
+					if($_POST['leg']=='0'){$checked = 'checked'; }
 					else if($_GET['l']=='0')
-					{
-						$checked = 'checked';
+					{	$checked = 'checked';
 						$disable_leg = 'disabled';
 					}
-					else
-						$checked = '';
-					if($_POST['leg']=='1')
-						$checked1 = 'checked';
+					else $checked = '';
+					
+					if($_POST['leg']=='1'){$checked1 = 'checked'; }
 					else if($_GET['l']=='1')
-					{
+					{	
 						$checked1 = 'checked';
 						$disable_leg = 'disabled';
 					}
@@ -368,63 +470,67 @@ window.onload = function() {
 						$checked1 = '';
 										
 			?>
-			<td>Left <input id="left" type="radio" name="leg" value="0" <?= $checked;?> <?= $disable_leg;?>/>Right<input id="right" type="radio" name="leg" value="1" <?= $checked1;?> <?= $disable_leg;?>/>
+
+			<td>Left <input id="left" type="radio" name="leg" value="0" <?= $checked;?> <?php if(!empty($disable_leg)) _e($disable_leg);?>/>Right<input id="right" type="radio" name="leg" value="1" <?= $checked1;?> <?php if(!empty($disable_leg)) _e($disable_leg);?>/>
+
+			
+
 			</td>
 		</tr>
 		
 		<tr><td colspan="2">&nbsp;</td></tr>
 		
 		<tr>
-			<td>First Name <span style="color:red;">*</span> :</td>
-			<td><input type="text" name="firstname" id="firstname" value="<?= htmlentities($_POST['firstname']);?>" maxlength="20" size="37" onBlur="return checkname(this.value, 'firstname');" ></td>
+			<td><?php  _e('First Name','binary-mlm-pro');?> <span style="color:red;">*</span> :</td>
+			<td><input type="text" name="firstname" id="firstname" value="<?php if(!empty($_POST['firstname']))  _e(htmlentities($_POST['firstname'])); ?>" maxlength="20" size="37" onBlur="return checkname(this.value, 'firstname');" ></td>
 		</tr>
 		
 		<tr><td colspan="2">&nbsp;</td></tr>
 		
 		<tr>
-			<td>Last Name <span style="color:red;">*</span> :</td>
-			<td><input type="text" name="lastname" id="lastname" value="<?= htmlentities($_POST['lastname']);?>" maxlength="20" size="37" onBlur="return checkname(this.value, 'lastname');"></td>
+			<td><?php  _e('Last Name','binary-mlm-pro');?> <span style="color:red;">*</span> :</td>
+			<td><input type="text" name="lastname" id="lastname" value="<?php if(!empty($_POST['lastname'])) _e(htmlentities($_POST['lastname']));?>" maxlength="20" size="37" onBlur="return checkname(this.value, 'lastname');"></td>
 		</tr>
 		
 		<tr><td colspan="2">&nbsp;</td></tr>
 		
 		<tr>
-			<td>Address Line 1 <span style="color:red;">*</span> :</td>
-			<td><input type="text" name="address1" id="address1" value="<?= htmlentities($_POST['address1']);?>"  size="37" onBlur="return allowspace(this.value,'address1');"></td>
+			<td><?php  _e('Address Line 1','binary-mlm-pro');?> <span style="color:red;">*</span> :</td>
+			<td><input type="text" name="address1" id="address1" value="<?php if(!empty($_POST['address1'])) _e(htmlentities($_POST['address1']));?>"  size="37" onBlur="return allowspace(this.value,'address1');"></td>
 		</tr>
 		
 		<tr><td colspan="2">&nbsp;</td></tr>
 		
 		<tr>
-			<td>Address Line 2 :</td>
-			<td><input type="text" name="address2" id="address2" value="<?= htmlentities($_POST['address2']);?>"  size="37" onBlur="return allowspace(this.value,'address2');"></td>
+			<td><?php  _e('Address Line 2','binary-mlm-pro');?> :</td>
+			<td><input type="text" name="address2" id="address2" value="<?php if(!empty($_POST['address2'])) _e(htmlentities($_POST['address2']));?>"  size="37" onBlur="return allowspace(this.value,'address2');"></td>
 		</tr>
 		
 		<tr><td colspan="2">&nbsp;</td></tr>
 		
 		<tr>
-			<td>City <span style="color:red;">*</span> :</td>
-			<td><input type="text" name="city" id="city" value="<?= htmlentities($_POST['city']);?>" maxlength="30" size="37" onBlur="return allowspace(this.value,'city');"></td>
+			<td><?php  _e('City','binary-mlm-pro');?> <span style="color:red;">*</span> :</td>
+			<td><input type="text" name="city" id="city" value="<?php if(!empty($_POST['city'])) _e(htmlentities($_POST['city']));?>" maxlength="30" size="37" onBlur="return allowspace(this.value,'city');"></td>
 		</tr>
 		
 		<tr><td colspan="2">&nbsp;</td></tr>
 		
 		<tr>
-			<td>State <span style="color:red;">*</span> :</td>
-			<td><input type="text" name="state" id="state" value="<?= htmlentities($_POST['state']);?>" maxlength="30" size="37" onBlur="return allowspace(this.value,'state');"></td>
+			<td><?php  _e('State','binary-mlm-pro');?> <span style="color:red;">*</span> :</td>
+			<td><input type="text" name="state" id="state" value="<?php if(!empty($_POST['state'])) _e(htmlentities($_POST['state']));?>" maxlength="30" size="37" onBlur="return allowspace(this.value,'state');"></td>
 		</tr>
 		
 		<tr><td colspan="2">&nbsp;</td></tr>
 		
 		<tr>
-			<td>Postal Code <span style="color:red;">*</span> :</td>
-			<td><input type="text" name="postalcode" id="postalcode" value="<?= htmlentities($_POST['postalcode']);?>" maxlength="20" size="37" onBlur="return allowspace(this.value,'postalcode');"></td>
+			<td><?php  _e('Postal Code','binary-mlm-pro');?> <span style="color:red;">*</span> :</td>
+			<td><input type="text" name="postalcode" id="postalcode" value="<?php if(!empty($_POST['postalcode']))  _e(htmlentities($_POST['postalcode']));?>" maxlength="20" size="37" onBlur="return numeric(this.value,'postalcode');"></td>
 		</tr>
 		
 		<tr><td colspan="2">&nbsp;</td></tr>
 		
 		<tr>
-			<td>Country <span style="color:red;">*</span> :</td>
+			<td><?php  _e('Country','binary-mlm-pro');?> <span style="color:red;">*</span> :</td>
 			<td>
 				<?php
 					$sql = "SELECT id, name
@@ -455,42 +561,42 @@ window.onload = function() {
 		<tr><td colspan="2">&nbsp;</td></tr>
 		
 		<tr>
-			<td>Email Address <span style="color:red;">*</span> :</td>
-			<td><input type="text" name="email" id="email" value="<?= htmlentities($_POST['email']);?>"  size="37" ></td>
+			<td><?php  _e('Email Address','binary-mlm-pro');?> <span style="color:red;">*</span> :</td>
+			<td><input type="text" name="email" id="email" value="<?php if(!empty($_POST['email']))  _e(htmlentities($_POST['email']));?>"  size="37" ></td>
 		</tr>
 		
 		<tr><td colspan="2">&nbsp;</td></tr><tr>
 		
 		<tr>
-			<td>Confirm Email Address <span style="color:red;">*</span> :</td>
-			<td><input type="text" name="confirm_email" id="confirm_email" value="<?= htmlentities($_POST['confirm_email']);?>" size="37" ></td>
+			<td><?php  _e('Confirm Email Address','binary-mlm-pro');?> <span style="color:red;">*</span> :</td>
+			<td><input type="text" name="confirm_email" id="confirm_email" value="<?php if(!empty($_POST['confirm_email']))  _e(htmlentities($_POST['confirm_email']));?>" size="37" ></td>
 		</tr>
 		
 		<tr><td colspan="2">&nbsp;</td></tr><tr>
 		
 		<tr>
-			<td>Contact No. <span style="color:red;">*</span> :</td>
-			<td><input type="text" name="telephone" id="telephone" value="<?= htmlentities($_POST['telephone']);?>" maxlength="20" size="37" onBlur="return numeric(this.value, 'telephone');" ></td>
+			<td><?php  _e('Contact No','binary-mlm-pro');?>. <span style="color:red;">*</span> :</td>
+			<td><input type="text" name="telephone" id="telephone" value="<?php if(!empty($_POST['telephone']))  _e(htmlentities($_POST['telephone']));?>" maxlength="20" size="37" onBlur="return numeric(this.value, 'telephone');" ></td>
 		</tr>
 		
 		<tr><td colspan="2">&nbsp;</td></tr>
 		
 		<tr>
-			<td>Date of Birth <span style="color:red;">*</span> :</td>
-			<td><input type="text" name="dob" id="dob" value="<?= htmlentities($_POST['dob']);?>" maxlength="20" size="22" ></td>
+			<td><?php  _e('Date of Birth','binary-mlm-pro');?> <span style="color:red;">*</span> :</td>
+			<td><input type="text" name="dob" id="dob" value="<?php if(!empty($_POST['dob']))  _e(htmlentities($_POST['dob']));?>" maxlength="20" size="22" ></td>
 		</tr>
 		
 		<tr><td colspan="2">&nbsp;</td></tr>
 		
 		<tr>
-			<td colspan="2"><input type="submit" name="submit" id="submit" value="Submit" /></td>
+			<td colspan="2"><input type="submit" name="submit" id="submit" value="<?php _e('Submit','binary-mlm-pro')?>" /></td>
 		</tr>
 	</form>
 </table>
 <?php
 	}
 	else
-		echo $msg;
+		 _e($msg);
 }//function end
 
 ?>
